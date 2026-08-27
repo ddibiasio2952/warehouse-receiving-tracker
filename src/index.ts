@@ -36,6 +36,16 @@ interface DiscrepancyResult {
     status: Discrepancy;
 }
 
+interface PurchaseOrderSummary {
+    purchaseOrderId: number;
+    totalLines: number;
+    totalExpected: number;
+    totalReceived: number;
+    totalDamaged: number;
+    totalUsableReceived: number;
+    netDifference: number;
+}
+
 /* INTERFACE OBJECTS */
 const firstSku: Sku = {
     id: 1,
@@ -57,6 +67,14 @@ const firstPurchaseOrder: PurchaseOrder = {
     expectedDate: "2026-09-03"
 };
 
+const secondPurchaseOrder: PurchaseOrder = {
+    id: 2,
+    poNumber: "PO02",
+    supplier: "Victoria Bay Plastics",
+    status: "open",
+    expectedDate: "2026-09-04"
+};
+
 const firstPurchaseOrderLine: PurchaseOrderLine = {
     id: 1,
     purchaseOrderId: firstPurchaseOrder.id,
@@ -71,6 +89,15 @@ const secondPurchaseOrderLine: PurchaseOrderLine = {
     purchaseOrderId: firstPurchaseOrder.id,
     skuId: secondSku.id,
     expectedQuantity: 30,
+    receivedQuantity: 0,
+    damagedQuantity: 0
+};
+
+const thirdPurchaseOrderLine: PurchaseOrderLine = {
+    id: 3,
+    purchaseOrderId: secondPurchaseOrder.id,
+    skuId: firstSku.id,
+    expectedQuantity: 10,
     receivedQuantity: 0,
     damagedQuantity: 0
 };
@@ -158,16 +185,68 @@ function getPurchaseOrderDiscrepancies(purchaseOrderId: number): DiscrepancyResu
     .map(line => calculateDiscrepancy(line));
 }
 
+// Summarize a Purchase Order
+function summarizePurchaseOrder(purchaseOrderId: number): PurchaseOrderSummary {
+    const discrepancies = getPurchaseOrderDiscrepancies(purchaseOrderId);
+    
+    return discrepancies.reduce<PurchaseOrderSummary>(
+        (accumulator, currentItem) => {
+            accumulator.totalLines += 1;
+            accumulator.totalExpected += currentItem.expectedQuantity;
+            accumulator.totalReceived += currentItem.receivedQuantity;
+            accumulator.totalDamaged += currentItem.damagedQuantity;
+            accumulator.totalUsableReceived += currentItem.usableReceived;
+            accumulator.netDifference += currentItem.difference;
+
+            return accumulator;
+        }, 
+        {
+            purchaseOrderId: purchaseOrderId,
+            totalLines: 0,
+            totalExpected: 0,
+            totalReceived: 0,
+            totalDamaged: 0,
+            totalUsableReceived: 0,
+            netDifference: 0
+        }
+    );
+}
+
+// Check if purchase order requires review
+function purchaseOrderRequiresReview(orderId: number): boolean {
+    const discrepancies = getPurchaseOrderDiscrepancies(orderId);
+
+    return discrepancies.some(result => result.status !== "match");    
+}
 
 // TEST
 addSku(firstSku);
 addSku(secondSku);
 addPurchaseOrderLine(firstPurchaseOrderLine);
 addPurchaseOrderLine(secondPurchaseOrderLine);
+addPurchaseOrderLine(thirdPurchaseOrderLine);
 recordReceivedQuantities(firstPurchaseOrderLine, 18, 2);
 recordReceivedQuantities(secondPurchaseOrderLine, 32, 1);
+recordReceivedQuantities(thirdPurchaseOrderLine, 10, 0);
 //console.log("Calculate Discrepancy:", 
 //    calculateDiscrepancy(firstPurchaseOrderLine));
 
 console.log("All discrepancies for PO Id #1:",
     getPurchaseOrderDiscrepancies(firstPurchaseOrder.id));
+
+console.log("Summarized Purchase Order: ", 
+    summarizePurchaseOrder(firstPurchaseOrder.id));
+
+console.log("Needs review? ", 
+    purchaseOrderRequiresReview(firstPurchaseOrder.id));
+////////////////////////////////////////////////////////////////
+console.log("All discrepancies for PO Id #2:",
+    getPurchaseOrderDiscrepancies(secondPurchaseOrder.id));
+
+console.log("Summarized Purchase Order: ", 
+    summarizePurchaseOrder(secondPurchaseOrder.id));
+
+console.log("Needs review? ", 
+    purchaseOrderRequiresReview(+));
+
+console.log("WEE: ", purchaseOrderLines[2]!.id);
