@@ -17,7 +17,7 @@ import {
     secondPurchaseOrderLine,
     thirdPurchaseOrderLine,
     skus,
-    purchaseOrders
+    purchaseOrderLines
 } from "../data"
 
 /* FUNCTIONS */
@@ -35,13 +35,13 @@ export const getSkus = (): Sku[] => {
 
 // Add a PurchaseOrderLine
 export const addPurchaseOrderLine = (purchaseOrderLine: PurchaseOrderLine): void => {
-    purchaseOrders.push(purchaseOrderLine);
+    purchaseOrderLines.push(purchaseOrderLine);
     console.log(`Added a purchaseOrderLine to the purchaseOrderLines array.`);
 };
 
 // Get all PurchaseOrderLines
 export const getPurchaseOrders = (): PurchaseOrderLine[] => {
-    return purchaseOrders;
+    return purchaseOrderLines;
 };
 
 // Record a received quantity
@@ -103,7 +103,7 @@ export function calculateDifference(line: PurchaseOrderLine): number {
 export function getPurchaseOrderDiscrepancies(purchaseOrderId: number): DiscrepancyResult[] {
     // Process each entry in purchaseOrderLines array
 
-    return purchaseOrders
+    return purchaseOrderLines
     .filter(line => line.purchaseOrderId === purchaseOrderId)
     .map(line => calculateDiscrepancy(line));
 }
@@ -151,4 +151,31 @@ export function getPurchaseOrdersToReview(orders: PurchaseOrderLine[]): Purchase
     return orders
         .filter(order => purchaseOrderRequiresReview(order.id))
         .map(order => summarizePurchaseOrder(order.id));
+}
+
+// Process Receipt function
+export function processReceipt(
+    lineId: number,
+    received: number,
+    damaged: number
+): DiscrepancyResult | undefined {
+    // Validate lineId
+    if (lineId <= 0) {
+        throw new Error("Id must be greater than 0.");
+    }
+
+    // Search for PO line
+    const line = purchaseOrderLines.find(purchaseOrder =>
+            purchaseOrder.id === lineId);
+    
+    // Validate PO line
+    if (line === undefined) {
+        return undefined;
+    }
+
+    // Record received quantities
+    const modifiedLine = recordReceivedQuantities(line, received, damaged);
+
+    // Calculate discrepancy and return result
+    return calculateDiscrepancy(modifiedLine);
 }

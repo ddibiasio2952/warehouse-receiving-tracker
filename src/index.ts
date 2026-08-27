@@ -17,7 +17,7 @@ import {
     secondPurchaseOrderLine,
     thirdPurchaseOrderLine,
     skus,
-    purchaseOrders
+    purchaseOrderLines
 } from "./data"
 
 import {
@@ -33,6 +33,7 @@ import {
     summarizePurchaseOrder,
     purchaseOrderRequiresReview,
     getPurchaseOrdersToReview,
+    processReceipt
 } from "./services/purchaseOrderService"
 
 
@@ -42,20 +43,6 @@ addSku(secondSku);
 addPurchaseOrderLine(firstPurchaseOrderLine);
 addPurchaseOrderLine(secondPurchaseOrderLine);
 addPurchaseOrderLine(thirdPurchaseOrderLine);
-recordReceivedQuantities(firstPurchaseOrderLine, 18, 2);
-recordReceivedQuantities(secondPurchaseOrderLine, 32, 1);
-recordReceivedQuantities(thirdPurchaseOrderLine, 10, 0);
-
-console.log("Needs review? ", 
-    purchaseOrderRequiresReview(firstPurchaseOrder.id));
-
-console.log("Needs review? ", 
-    purchaseOrderRequiresReview(secondPurchaseOrder.id));
-
-console.log("Summarized Purchase Order 1: ", 
-    summarizePurchaseOrder(firstPurchaseOrder.id));
-
-console.log("Summarized Purchase Order 2: ", 
-    summarizePurchaseOrder(secondPurchaseOrder.id));
-
-console.log("Get purchase orders to review: ", getPurchaseOrdersToReview(purchaseOrders));
+console.log("One: ", processReceipt(1, 18, 2));
+console.log("Two: ", processReceipt(2, 32, 1));
+console.log("Three: ", processReceipt(3, 10, 0));

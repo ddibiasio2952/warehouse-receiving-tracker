@@ -65,4 +65,4 @@ export const thirdPurchaseOrderLine: PurchaseOrderLine = {
 };
 
 export const skus: Sku[] = [];
-export const purchaseOrders: PurchaseOrderLine[] = [];
+export const purchaseOrderLines: PurchaseOrderLine[] = [];
