@@ -1,48 +1,40 @@
-import { 
-    PurchaseOrderStatus,
-    Discrepancy,
-    Sku,
-    PurchaseOrder,
-    PurchaseOrderLine,
-    DiscrepancyResult,
-    PurchaseOrderSummary
- } from "./types";
+import purchaseOrderRouter from "./routes/purchaseOrderRoutes";
 
-import {
-    firstSku,
-    secondSku,
-    firstPurchaseOrder,
-    secondPurchaseOrder,
-    firstPurchaseOrderLine,
-    secondPurchaseOrderLine,
-    thirdPurchaseOrderLine,
-    skus,
-    purchaseOrderLines
-} from "./data"
+/* SERVER BOILERPLATE */
+// Import Express framework
+import express, {
+    type Express,
+    type Request,
+    type Response
+} from "express";
 
-import {
-    addSku,
-    getSkus,
-    addPurchaseOrderLine,
-    getPurchaseOrders,
-    recordReceivedQuantities,
-    calculateDiscrepancy,
-    getDiscrepancyStatus,
-    calculateDifference,
-    getPurchaseOrderDiscrepancies,
-    summarizePurchaseOrder,
-    purchaseOrderRequiresReview,
-    getPurchaseOrdersToReview,
-    processReceipt
-} from "./services/purchaseOrderService"
+// Create the Express application
+const app: Express = express();
 
+// Set network port for server to listen from
+const port: number = 3000;
 
-// TEST
-addSku(firstSku);
-addSku(secondSku);
-addPurchaseOrderLine(firstPurchaseOrderLine);
-addPurchaseOrderLine(secondPurchaseOrderLine);
-addPurchaseOrderLine(thirdPurchaseOrderLine);
-console.log("One: ", processReceipt(1, 18, 2));
-console.log("Two: ", processReceipt(2, 32, 1));
-console.log("Three: ", processReceipt(3, 10, 0));
+// Allow server to read requests
+app.use(express.json());
+
+// Send requests to applicable routers
+app.use(
+    "/api/purchase-orders",
+    purchaseOrderRouter
+);
+
+// Define a GET endpoint for root URL
+app.get("/", (request: Request, response: Response): void => {
+    // Send a JSON response to confirm API is online
+    response.json({
+        message: "Receiving Discrepancy Tracker API"
+    });
+});
+
+// Start HTTP server and listen for requests
+app.listen(port, (): void => {
+    // Callback runs after successful boot
+    console.log(
+        `Server running at http://localhost:${port}`
+    );
+});

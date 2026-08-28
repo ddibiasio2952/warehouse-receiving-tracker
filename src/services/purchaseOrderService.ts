@@ -179,3 +179,12 @@ export function processReceipt(
     // Calculate discrepancy and return result
     return calculateDiscrepancy(modifiedLine);
 }
+
+addSku(firstSku);
+addSku(secondSku);
+addPurchaseOrderLine(firstPurchaseOrderLine);
+addPurchaseOrderLine(secondPurchaseOrderLine);
+addPurchaseOrderLine(thirdPurchaseOrderLine);
+processReceipt(1, 18, 2);
+processReceipt(2, 32, 1);
+processReceipt(3, 10, 0);
