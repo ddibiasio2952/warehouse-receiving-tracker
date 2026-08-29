@@ -5,13 +5,15 @@ import sql = require("mssql/msnodesqlv8");
 import { getPool } from "../config/database";
 
 // Import interface types
-import { 
+import {
     PurchaseOrder,
-    PurchaseOrderLine 
+    PurchaseOrderBody,
+    PurchaseOrderLine,
+    PurchaseOrderStatus
 } from "../types/types";
 
 import {
-    getLineReports 
+    getLineReports
 } from "../services/purchaseOrderService";
 
 // Retrieve every purchase order
@@ -179,6 +181,61 @@ export async function purchaseOrderExists(
     return Number(result.recordset[0]?.recordExists) === 1;
 }
 
+// Add a purchase order
+export async function addPurchaseOrder(
+    cleanedData: PurchaseOrderBody
+): Promise<PurchaseOrder | undefined> {
+    const pool = await getPool();
+
+    // Destructure cleaned data
+    const { supplier, status, expectedDate } = cleanedData;
+
+    // Convert date to Date Value
+    const expectedDateValue =
+        new Date(`${expectedDate}T00:00:00.000Z`);
+
+    const result = await pool
+        .request()
+        .input("supplier", sql.NVarChar(150), supplier)
+        .input("status", sql.NVarChar(20), status)
+        .input("expectedDate", sql.Date, expectedDateValue)
+        .query<{
+            id: number;
+            supplier: string;
+            status: PurchaseOrderStatus;
+            expectedDate: Date;
+        }>(`
+            INSERT INTO PurchaseOrders
+                (supplier, status, expectedDate)
+            OUTPUT
+                INSERTED.Id AS id,
+                INSERTED.Supplier AS supplier,
+                INSERTED.Status AS status,
+                INSERTED.ExpectedDate AS expectedDate
+            VALUES (
+                @supplier,
+                @status,
+                @expectedDate
+            );
+        `);
+
+    const newOrder = result.recordset[0];
+
+    if (newOrder === undefined) {
+        return undefined;
+    }
+
+    return {
+        id: Number(newOrder.id),
+        supplier: newOrder.supplier,
+        status: newOrder.status,
+        expectedDate:
+            newOrder.expectedDate
+                .toISOString()
+                .slice(0, 10)
+    };
+}
+
 // Update receipt quantities
 export async function updateReceiptQuantities(
     lineId: number,
@@ -209,5 +266,5 @@ export async function updateReceiptQuantities(
             WHERE Id = @lineId;
         `);
 
-        return result.recordset[0];
+    return result.recordset[0];
 }

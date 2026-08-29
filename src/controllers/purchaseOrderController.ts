@@ -8,13 +8,15 @@ import {
 // Import Validation Functions
 import {
     isPositiveInteger,
-    validateQuantities
+    validateQuantities,
+    validateSupplier,
+    validateDate
 } from "../utilities/validation";
 
 // Import sample PO data
-import { 
-    PurchaseOrderBody, 
-    ReceiptRequestBody 
+import {
+    PurchaseOrderBody,
+    ReceiptRequestBody
 } from "../types/types";
 
 // Import business logic
@@ -29,7 +31,8 @@ import {
 import {
     getPurchaseOrders,
     purchaseOrderExists,
-    getAllPurchaseOrderLines
+    getAllPurchaseOrderLines,
+    addPurchaseOrder
 } from "../repositories/purchaseOrderRepository";
 
 // Create a router for PO endpoints
@@ -169,23 +172,71 @@ export async function getLineReportsByPurchaseOrderId(
 // Post a new PO
 export async function postOrder(
     request: Request<
+        Record<string, never>,
+        unknown,
         PurchaseOrderBody
     >,
     response: Response
 ): Promise<void> {
     // Retrieve body values
-    const { supplier, status, expectedDate } = request.body;
+    const { supplier, expectedDate } = request.body ?? {};
+
+    // Verify data strings are strings and not empty
+    if (
+        typeof supplier !== "string" ||
+        supplier.trim() === "" ||
+        typeof expectedDate !== "string" ||
+        expectedDate.trim() === ""
+    ) {
+        response.status(400).json({
+            message: "Data must be a string and not empty."
+        });
+        return;
+    }
+
+    const cleanedSupplier = supplier.trim();
+    const cleanedDate = expectedDate.trim();
 
     // Validate supplier is from list
-
-    // Validate status === "open"
+    // FUTURE IMPROEMENT: Add supplier entry to database and confirm with repository call
+    if (!validateSupplier(cleanedSupplier)) {
+        response.status(400).json({
+            message: "Supplier must be from approved list."
+        });
+        return;
+    }
 
     // Validate expectedDate is in the future
+    if (!validateDate(cleanedDate)) {
+        response.status(400).json({
+            message: "The expected date must be in the future and match format YYY-MM-DD."
+        });
+        return;
+    }
+
+    const cleanedData: PurchaseOrderBody = {
+        supplier: cleanedSupplier,
+        status: "open",
+        expectedDate: cleanedDate
+    }
 
     try {
-        
+        const result = await addPurchaseOrder(cleanedData);
+
+        if (result === undefined) {
+            response.status(500).json({
+                message: "The purchase order could not be created."
+            });
+            return;
+        }
+
+        response.status(201).json(result);
     } catch (error) {
-        
+        console.error("Error posting purchase order: ", error);
+
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
     }
 }
 

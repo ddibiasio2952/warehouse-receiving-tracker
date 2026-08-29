@@ -7,6 +7,7 @@ import {
     getPurchaseOrderSummary,
     getLineReportsByPurchaseOrderId,
     getPurchaseOrdersForReview,
+    postOrder,
     postReceipt
 } from "../controllers/purchaseOrderController";
 
