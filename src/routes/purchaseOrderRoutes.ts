@@ -3,6 +3,7 @@ import { Router } from "express";
 
 // Import Controllers
 import {
+    getAllPurchaseOrders,
     getPurchaseOrderSummary,
     getLineReportsByPurchaseOrderId,
     getPurchaseOrdersForReview,
@@ -11,6 +12,12 @@ import {
 
 // Create a router for PO endpoints
 const purchaseOrderRouter: Router = Router();
+
+// GET /api/purchase-orders
+purchaseOrderRouter.get(
+    "/",
+    getAllPurchaseOrders
+)
 
 // GET /api/purchase-orders/:id/summary
 purchaseOrderRouter.get(
@@ -29,6 +36,12 @@ purchaseOrderRouter.get(
     "/:id/line-reports-by-po",
     getLineReportsByPurchaseOrderId
 );
+
+// POST /api/purchase-orders/new-order
+purchaseOrderRouter.post(
+    "/new-order",
+    postOrder
+)
 
 // POST /api/purchase-orders/:id/receipt
 purchaseOrderRouter.post(

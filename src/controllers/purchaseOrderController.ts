@@ -12,24 +12,48 @@ import {
 } from "../utilities/validation";
 
 // Import sample PO data
-import { ReceiptRequestBody } from "../types/types";
+import { 
+    PurchaseOrderBody, 
+    ReceiptRequestBody 
+} from "../types/types";
 
 // Import business logic
 import {
     summarizePurchaseOrder,
     processReceipt,
     getPurchaseOrdersToReview,
-    getLineReports 
+    getLineReports
 } from "../services/purchaseOrderService";
 
 // Import repository operations
 import {
+    getPurchaseOrders,
     purchaseOrderExists,
     getAllPurchaseOrderLines
 } from "../repositories/purchaseOrderRepository";
 
 // Create a router for PO endpoints
 const purchaseOrderRouter: Router = Router();
+
+// Get all POs
+export async function getAllPurchaseOrders(
+    request: Request,
+    response: Response
+): Promise<void> {
+    try {
+        // Get all purchase orders from repository
+        const result = await getPurchaseOrders();
+
+        response.status(200).json(result);
+
+    } catch (error) {
+        console.error("Error retrieving  all purchase orders: ", error);
+
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
+    }
+}
 
 // Get a PO summary
 export async function getPurchaseOrderSummary(
@@ -139,6 +163,29 @@ export async function getLineReportsByPurchaseOrderId(
         response.status(500).json({
             message: "An internal server error occurred."
         });
+    }
+}
+
+// Post a new PO
+export async function postOrder(
+    request: Request<
+        PurchaseOrderBody
+    >,
+    response: Response
+): Promise<void> {
+    // Retrieve body values
+    const { supplier, status, expectedDate } = request.body;
+
+    // Validate supplier is from list
+
+    // Validate status === "open"
+
+    // Validate expectedDate is in the future
+
+    try {
+        
+    } catch (error) {
+        
     }
 }
 

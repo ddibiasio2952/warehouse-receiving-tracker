@@ -1,46 +1,48 @@
+// Import SQL driver
 import sql = require("mssql/msnodesqlv8");
 
+// Import Pool
 import { getPool } from "../config/database";
-import { PurchaseOrderLine } from "../types/types";
 
-import {
-    PurchaseOrderSummary
+// Import interface types
+import { 
+    PurchaseOrder,
+    PurchaseOrderLine 
 } from "../types/types";
 
 import {
     getLineReports 
 } from "../services/purchaseOrderService";
 
-// Update receipt quantities
-export async function updateReceiptQuantities(
-    lineId: number,
-    received: number,
-    damaged: number
-): Promise<PurchaseOrderLine | undefined> {
+// Retrieve every purchase order
+export async function getPurchaseOrders():
+    Promise<PurchaseOrder[]> {
     const pool = await getPool();
 
     const result = await pool
         .request()
-        .input("lineId", sql.Int, lineId)
-        .input("received", sql.Int, received)
-        .input("damaged", sql.Int, damaged)
-        .query<PurchaseOrderLine>(`
-            UPDATE PurchaseOrderLines
-            SET
-                ReceivedQuantity = @received,
-                DamagedQuantity = @damaged
-            OUTPUT
-                INSERTED.Id AS id,
-                INSERTED.PurchaseOrderId AS purchaseOrderId,
-                INSERTED.SkuId AS skuId,
-                INSERTED.ExpectedQuantity AS expectedQuantity,
-                INSERTED.ReceivedQuantity AS receivedQuantity,
-                INSERTED.DamagedQuantity AS damagedQuantity
-            WHERE Id = @lineId;
+        .query<PurchaseOrder>(`
+            SELECT
+                Id AS id,
+                Supplier AS supplier,
+                Status AS status,
+                CONVERT(
+                    VARCHAR(10),
+                    ExpectedDate,
+                    23
+                ) AS expectedDate
+            FROM PurchaseOrders
+            ORDER BY Id;
         `);
 
-        return result.recordset[0];
+    return result.recordset.map(order => ({
+        id: Number(order.id),
+        supplier: order.supplier,
+        status: order.status,
+        expectedDate: order.expectedDate
+    }));
 }
+
 
 // Retrieve every line belonging to one purchase order
 export async function getPurchaseOrderLinesByOrderId(
@@ -62,7 +64,8 @@ export async function getPurchaseOrderLinesByOrderId(
                 SkuId AS skuId,
                 ExpectedQuantity AS expectedQuantity,
                 ReceivedQuantity AS receivedQuantity,
-                DamagedQuantity AS damagedQuantity
+                DamagedQuantity AS damagedQuantity,
+                ReceiptRecorded AS receiptRecorded
             FROM PurchaseOrderLines
             WHERE PurchaseOrderId = @purchaseOrderId
             ORDER BY Id;
@@ -75,7 +78,8 @@ export async function getPurchaseOrderLinesByOrderId(
         skuId: Number(line.skuId),
         expectedQuantity: Number(line.expectedQuantity),
         receivedQuantity: Number(line.receivedQuantity),
-        damagedQuantity: Number(line.damagedQuantity)
+        damagedQuantity: Number(line.damagedQuantity),
+        receiptRecorded: Boolean(line.receiptRecorded)
     }));
 }
 
@@ -99,7 +103,8 @@ export async function getPurchaseOrderLinesByOrderId(
                 SkuId AS skuId,
                 ExpectedQuantity AS expectedQuantity,
                 ReceivedQuantity AS receivedQuantity,
-                DamagedQuantity AS damagedQuantity
+                DamagedQuantity AS damagedQuantity,
+                ReceiptRecorded AS receiptRecorded
             FROM PurchaseOrderLines
             WHERE PurchaseOrderId = @purchaseOrderId
             ORDER BY Id;
@@ -113,6 +118,7 @@ export async function getPurchaseOrderLinesByOrderId(
         expectedQuantity: Number(line.expectedQuantity),
         receivedQuantity: Number(line.receivedQuantity),
         damagedQuantity: Number(line.damagedQuantity)
+        receiptRecorded: Boolean(line.receiptRecorded)
     }));
 }*/
 
@@ -130,7 +136,8 @@ export async function getAllPurchaseOrderLines():
                 SkuId AS skuId,
                 ExpectedQuantity AS expectedQuantity,
                 ReceivedQuantity AS receivedQuantity,
-                DamagedQuantity AS damagedQuantity
+                DamagedQuantity AS damagedQuantity,
+                ReceiptRecorded AS receiptRecorded
             FROM PurchaseOrderLines
             ORDER BY Id;
         `);
@@ -142,7 +149,8 @@ export async function getAllPurchaseOrderLines():
         skuId: Number(line.skuId),
         expectedQuantity: Number(line.expectedQuantity),
         receivedQuantity: Number(line.receivedQuantity),
-        damagedQuantity: Number(line.damagedQuantity)
+        damagedQuantity: Number(line.damagedQuantity),
+        receiptRecorded: Boolean(line.receiptRecorded)
     }));
 }
 
@@ -169,4 +177,37 @@ export async function purchaseOrderExists(
         `);
 
     return Number(result.recordset[0]?.recordExists) === 1;
+}
+
+// Update receipt quantities
+export async function updateReceiptQuantities(
+    lineId: number,
+    received: number,
+    damaged: number
+): Promise<PurchaseOrderLine | undefined> {
+    const pool = await getPool();
+
+    const result = await pool
+        .request()
+        .input("lineId", sql.Int, lineId)
+        .input("received", sql.Int, received)
+        .input("damaged", sql.Int, damaged)
+        .query<PurchaseOrderLine>(`
+            UPDATE PurchaseOrderLines
+            SET
+                ReceivedQuantity = @received,
+                DamagedQuantity = @damaged,
+                ReceiptRecorded = 1
+            OUTPUT
+                INSERTED.Id AS id,
+                INSERTED.PurchaseOrderId AS purchaseOrderId,
+                INSERTED.SkuId AS skuId,
+                INSERTED.ExpectedQuantity AS expectedQuantity,
+                INSERTED.ReceivedQuantity AS receivedQuantity,
+                INSERTED.DamagedQuantity AS damagedQuantity
+                INSERTED.ReceiptRecorded AS receiptRecorded
+            WHERE Id = @lineId;
+        `);
+
+        return result.recordset[0];
 }

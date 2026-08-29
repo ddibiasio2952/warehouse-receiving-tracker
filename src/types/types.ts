@@ -1,6 +1,7 @@
 /* TYPES */
-export type PurchaseOrderStatus = "open" | "received" | "resolved";
-export type Discrepancy = "shortage" | "overage" | "match";
+export type PurchaseOrderStatus = "open" | "received" | "resolved" | "closed";
+export type LineStatus = "shortage" | "overage" | "match";
+export type Supplier = "Victoria Bay" | "Novolex" | "Dart";
 
 /* INTERFACES */
 export interface Sku {
@@ -11,7 +12,6 @@ export interface Sku {
 
 export interface PurchaseOrder {
     id: number;
-    poNumber: string;
     supplier: string;
     status: PurchaseOrderStatus;
     expectedDate: string;
@@ -24,6 +24,7 @@ export interface PurchaseOrderLine {
     expectedQuantity: number;
     receivedQuantity: number;
     damagedQuantity: number;
+    receiptRecorded: boolean;
 }
 
 export interface LineResult {
@@ -32,8 +33,8 @@ export interface LineResult {
     receivedQuantity: number;
     damagedQuantity: number;
     usableReceived: number;
-    difference: number;
-    status: Discrepancy;
+    difference: number | null;
+    status: LineStatus;
 }
 
 export interface PurchaseOrderSummary {
@@ -45,6 +46,12 @@ export interface PurchaseOrderSummary {
     totalDamaged: number;
     totalUsableReceived: number;
     netDifference: number;
+}
+
+export interface PurchaseOrderBody {
+    supplier: string;
+    status: PurchaseOrderStatus;
+    expectedDate: string;
 }
 
 export interface ReceiptRequestBody {

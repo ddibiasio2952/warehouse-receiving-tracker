@@ -1,5 +1,5 @@
 import { 
-    Discrepancy,
+    LineStatus,
     PurchaseOrderLine,
     LineResult,
     PurchaseOrderSummary
@@ -16,11 +16,13 @@ import {
 export function calculateDiscrepancy(
     line: PurchaseOrderLine
 ): LineResult {
-    // Get the difference
-    const difference: number = calculateDifference(line);
-    // Get the status
-    const discrepancyStatus: Discrepancy = getDiscrepancyStatus(difference);
+    // Calculate the good received products
+    const difference =
+        (line.receivedQuantity - line.damagedQuantity) 
+        - line.expectedQuantity;
 
+    // Get the status
+    const lineStatus: LineStatus = getDiscrepancyStatus(difference);
     // Return DiscrepancyResult
     return {
         purchaseOrderLineId: line.id,
@@ -30,22 +32,16 @@ export function calculateDiscrepancy(
         usableReceived:
             line.receivedQuantity - line.damagedQuantity,
         difference: difference,
-        status: discrepancyStatus
+        status: lineStatus
     };
 };
 
 // Get purchase order discrepancy status
-export function getDiscrepancyStatus(difference: number): Discrepancy {
+export function getDiscrepancyStatus(difference: number): LineStatus {
 
     return difference < 0 ? "shortage" :
         difference > 0 ? "overage" :
             "match";
-};
-
-// Calculate the difference of a purchase order line
-export function calculateDifference(line: PurchaseOrderLine): number {
-    return (line.receivedQuantity - line.damagedQuantity) 
-        - line.expectedQuantity;
 };
 
 // Get purchase order line discrepancy reports by purchase order Id
@@ -70,14 +66,15 @@ export async function summarizePurchaseOrder(
     return lineDiscrepancyReport.reduce<PurchaseOrderSummary>(
         (accumulator, currentItem) => {
             accumulator.totalLines += 1;
-            if (currentItem.status !== "match") {
+            if (currentItem.status === "shortage" ||
+                currentItem.status === "overage") {
                 accumulator.discrepancyLines += 1;
             }
             accumulator.totalExpected += currentItem.expectedQuantity;
             accumulator.totalReceived += currentItem.receivedQuantity;
             accumulator.totalDamaged += currentItem.damagedQuantity;
             accumulator.totalUsableReceived += currentItem.usableReceived;
-            accumulator.netDifference += currentItem.difference;
+            accumulator.netDifference += currentItem.difference ?? 0;
 
             return accumulator;
         }, 
@@ -127,7 +124,10 @@ export async function purchaseOrderRequiresReview(
     const lineReports = await getLineReports(orderId);
 
     // Return results which have discrepancies
-    return lineReports.some(result => result.status !== "match");    
+    return lineReports.some(report => 
+        report.status === "shortage" ||
+        report.status === "overage"
+);    
 }
 
 // Process receipt function
