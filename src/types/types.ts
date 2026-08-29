@@ -1,5 +1,3 @@
-
-
 /* TYPES */
 export type PurchaseOrderStatus = "open" | "received" | "resolved";
 export type Discrepancy = "shortage" | "overage" | "match";
@@ -47,5 +45,10 @@ export interface PurchaseOrderSummary {
     totalDamaged: number;
     totalUsableReceived: number;
     netDifference: number;
+}
+
+export interface ReceiptRequestBody {
+    received: number;
+    damaged: number;
 }
 

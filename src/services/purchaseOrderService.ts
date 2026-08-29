@@ -1,73 +1,21 @@
 import { 
-    PurchaseOrderStatus,
     Discrepancy,
-    Sku,
-    PurchaseOrder,
     PurchaseOrderLine,
     DiscrepancyResult,
     PurchaseOrderSummary
- } from "../types";
+ } from "../types/types";
 
 import {
-    firstSku,
-    secondSku,
-    firstPurchaseOrder,
-    secondPurchaseOrder,
-    firstPurchaseOrderLine,
-    secondPurchaseOrderLine,
-    thirdPurchaseOrderLine,
-    skus,
-    purchaseOrderLines
-} from "../data"
+    getPurchaseOrderLinesByOrderId,
+    updateReceiptQuantities
+} from "../repositories/purchaseOrderRepository";
 
 /* FUNCTIONS */
 
-// POST a Sku
-export const addSku = (sku: Sku): void => {
-    skus.push(sku);
-    console.log(`Added ${sku.description} to the skus array.`);
-};
-
-// Get all Skus
-export const getSkus = (): Sku[] => {
-    return skus;
-};
-
-// Add a PurchaseOrderLine
-export const addPurchaseOrderLine = (purchaseOrderLine: PurchaseOrderLine): void => {
-    purchaseOrderLines.push(purchaseOrderLine);
-    console.log(`Added a purchaseOrderLine to the purchaseOrderLines array.`);
-};
-
-// Get all PurchaseOrderLines
-export const getPurchaseOrders = (): PurchaseOrderLine[] => {
-    return purchaseOrderLines;
-};
-
-// Record a received quantity
-export const recordReceivedQuantities = (
-    line: PurchaseOrderLine,
-    received: number,
-    damaged: number
-): PurchaseOrderLine => {
-    if (received < 0 || damaged < 0) {
-        throw new Error("Quantities cannot be negative.");
-    }
-
-    if (damaged > received) {
-        throw new Error("Damaged quantity cannot exceed received quantity.");
-    }
-
-    line.receivedQuantity = received;
-    line.damagedQuantity = damaged;
-
-    return line;
-};
-
-// Calculate the Discrepancy
-export const calculateDiscrepancy = (
+// Calculate and return purchase order line's discrepancy
+export function calculateDiscrepancy(
     line: PurchaseOrderLine
-): DiscrepancyResult => {
+): DiscrepancyResult {
     // Get the difference
     const difference: number = calculateDifference(line);
     // Get the status
@@ -96,23 +44,30 @@ export function getDiscrepancyStatus(difference: number): Discrepancy {
 
 // Calculate the difference
 export function calculateDifference(line: PurchaseOrderLine): number {
-    return (line.receivedQuantity - line.damagedQuantity) - line.expectedQuantity;
+    return (line.receivedQuantity - line.damagedQuantity) 
+        - line.expectedQuantity;
 };
 
-// Run all purchase order lines
-export function getPurchaseOrderDiscrepancies(purchaseOrderId: number): DiscrepancyResult[] {
-    // Process each entry in purchaseOrderLines array
-
-    return purchaseOrderLines
-    .filter(line => line.purchaseOrderId === purchaseOrderId)
-    .map(line => calculateDiscrepancy(line));
+// Get purchase order lines with discrepancies by purchase order Id
+export async function getLineDiscrepancyReport(
+    purchaseOrderId: number
+): Promise<DiscrepancyResult[]> {
+    // Retrieve lines from from repository 
+    const lines = await getPurchaseOrderLinesByOrderId(purchaseOrderId);
+    
+    // Calculate any discrepancies and return
+    return lines.map(line => calculateDiscrepancy(line));
 }
 
 // Summarize a Purchase Order
-export function summarizePurchaseOrder(purchaseOrderId: number): PurchaseOrderSummary {
-    const discrepancies = getPurchaseOrderDiscrepancies(purchaseOrderId);
+export async function summarizePurchaseOrder(
+    purchaseOrderId: number
+): Promise<PurchaseOrderSummary> {
+    // Get discrepancy reports for each PO line
+    const lineDiscrepancyReport = await getLineDiscrepancyReport(purchaseOrderId);
     
-    return discrepancies.reduce<PurchaseOrderSummary>(
+    // Return a summary of the purchase order
+    return lineDiscrepancyReport.reduce<PurchaseOrderSummary>(
         (accumulator, currentItem) => {
             accumulator.totalLines += 1;
             if (currentItem.status !== "match") {
@@ -139,52 +94,61 @@ export function summarizePurchaseOrder(purchaseOrderId: number): PurchaseOrderSu
     );
 }
 
-// Check if purchase order requires review
-export function purchaseOrderRequiresReview(orderId: number): boolean {
-    const discrepancies = getPurchaseOrderDiscrepancies(orderId);
+// Get summaries of purchase orders requiring review
+export async function getPurchaseOrdersToReview(
+    orders: PurchaseOrderLine[]
+): Promise<PurchaseOrderSummary[]> {
+    // Initiate summaries array
+    const summaries: PurchaseOrderSummary[] = [];
 
-    return discrepancies.some(result => result.status !== "match");    
+    for (const order of orders) {
+        // Get all purchase orders requiring review
+        const requiresReview = 
+            await purchaseOrderRequiresReview(order.id);
+        
+        // Summarize purchase orders requiring review
+        if (requiresReview) {
+            const summary = 
+                await summarizePurchaseOrder(order.id);
+
+                // Add to summaries array
+                summaries.push(summary);
+        }
+    }
+
+    return summaries;
 }
 
-// Review queue
-export function getPurchaseOrdersToReview(orders: PurchaseOrderLine[]): PurchaseOrderSummary[] {
-    return orders
-        .filter(order => purchaseOrderRequiresReview(order.id))
-        .map(order => summarizePurchaseOrder(order.id));
+// Check if purchase order requires review
+export async function purchaseOrderRequiresReview(
+    orderId: number
+): Promise<boolean> {
+    // Check if purchase order has discrepancies and return matching lines
+    const discrepancyReports = await getLineDiscrepancyReport(orderId);
+
+    // Return results which have discrepancies
+    return discrepancyReports.some(result => result.status !== "match");    
 }
 
 // Process Receipt function
-export function processReceipt(
+export async function processReceipt(
     lineId: number,
     received: number,
     damaged: number
-): DiscrepancyResult | undefined {
-    // Validate lineId
-    if (lineId <= 0) {
-        throw new Error("Id must be greater than 0.");
-    }
+): Promise<DiscrepancyResult | undefined> {
 
-    // Search for PO line
-    const line = purchaseOrderLines.find(purchaseOrder =>
-            purchaseOrder.id === lineId);
-    
-    // Validate PO line
-    if (line === undefined) {
+    // Send to repository
+    const updatedLine = await updateReceiptQuantities(
+        lineId,
+        received,
+        damaged
+    );
+
+    // Validate lineId
+    if (updatedLine === undefined) {
         return undefined;
     }
 
-    // Record received quantities
-    const modifiedLine = recordReceivedQuantities(line, received, damaged);
-
-    // Calculate discrepancy and return result
-    return calculateDiscrepancy(modifiedLine);
+    // Calculate discrepancy of PO line and return result
+    return calculateDiscrepancy(updatedLine);
 }
-
-addSku(firstSku);
-addSku(secondSku);
-addPurchaseOrderLine(firstPurchaseOrderLine);
-addPurchaseOrderLine(secondPurchaseOrderLine);
-addPurchaseOrderLine(thirdPurchaseOrderLine);
-processReceipt(1, 18, 2);
-processReceipt(2, 32, 1);
-processReceipt(3, 10, 0);

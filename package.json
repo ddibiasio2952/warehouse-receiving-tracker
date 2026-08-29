@@ -6,16 +6,22 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "go": "npm run build && npm run start"
+    "go": "npm run build && npm run start",
+    "test-db": "npm run build && node dist/scripts/testDatabase.js",
+    "test-repository": "npm run build && node dist/scripts/testRepository.js"
   },
   "author": "Daniel DiBiasio",
   "license": "UNLICENSED",
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/mssql": "^12.3.0",
     "@types/node": "^26.3.0",
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "msnodesqlv8": "^5.3.0",
+    "mssql": "^12.7.0"
   }
 }
