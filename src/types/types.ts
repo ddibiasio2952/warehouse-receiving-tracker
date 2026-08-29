@@ -26,7 +26,7 @@ export interface PurchaseOrderLine {
     damagedQuantity: number;
 }
 
-export interface DiscrepancyResult {
+export interface LineResult {
     purchaseOrderLineId: number;
     expectedQuantity: number;
     receivedQuantity: number;

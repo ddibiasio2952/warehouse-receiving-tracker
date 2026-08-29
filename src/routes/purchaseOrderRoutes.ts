@@ -1,15 +1,12 @@
 // Import Express's Router function and request / response types
-import {
-    Router,
-    type Request,
-    type Response
-} from "express";
+import { Router } from "express";
 
 // Import Controllers
 import {
     getPurchaseOrderSummary,
-    postReceipt,
-    getPurchaseOrdersForReview
+    getLineReportsByPurchaseOrderId,
+    getPurchaseOrdersForReview,
+    postReceipt
 } from "../controllers/purchaseOrderController";
 
 // Create a router for PO endpoints
@@ -25,6 +22,12 @@ purchaseOrderRouter.get(
 purchaseOrderRouter.get(
     "/review",
     getPurchaseOrdersForReview
+);
+
+// GET /api/purchase-orders/:id/line-reports-by-po
+purchaseOrderRouter.get(
+    "/:id/line-reports-by-po",
+    getLineReportsByPurchaseOrderId
 );
 
 // POST /api/purchase-orders/:id/receipt

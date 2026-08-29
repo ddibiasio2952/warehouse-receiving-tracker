@@ -1,7 +1,7 @@
 import { 
     Discrepancy,
     PurchaseOrderLine,
-    DiscrepancyResult,
+    LineResult,
     PurchaseOrderSummary
  } from "../types/types";
 
@@ -15,7 +15,7 @@ import {
 // Calculate and return purchase order line's discrepancy
 export function calculateDiscrepancy(
     line: PurchaseOrderLine
-): DiscrepancyResult {
+): LineResult {
     // Get the difference
     const difference: number = calculateDifference(line);
     // Get the status
@@ -34,7 +34,7 @@ export function calculateDiscrepancy(
     };
 };
 
-// Get Discrepancy status
+// Get purchase order discrepancy status
 export function getDiscrepancyStatus(difference: number): Discrepancy {
 
     return difference < 0 ? "shortage" :
@@ -42,16 +42,16 @@ export function getDiscrepancyStatus(difference: number): Discrepancy {
             "match";
 };
 
-// Calculate the difference
+// Calculate the difference of a purchase order line
 export function calculateDifference(line: PurchaseOrderLine): number {
     return (line.receivedQuantity - line.damagedQuantity) 
         - line.expectedQuantity;
 };
 
-// Get purchase order lines with discrepancies by purchase order Id
-export async function getLineDiscrepancyReport(
+// Get purchase order line discrepancy reports by purchase order Id
+export async function getLineReports(
     purchaseOrderId: number
-): Promise<DiscrepancyResult[]> {
+): Promise<LineResult[]> {
     // Retrieve lines from from repository 
     const lines = await getPurchaseOrderLinesByOrderId(purchaseOrderId);
     
@@ -59,12 +59,12 @@ export async function getLineDiscrepancyReport(
     return lines.map(line => calculateDiscrepancy(line));
 }
 
-// Summarize a Purchase Order
+// Summarize a purchase order
 export async function summarizePurchaseOrder(
     purchaseOrderId: number
 ): Promise<PurchaseOrderSummary> {
-    // Get discrepancy reports for each PO line
-    const lineDiscrepancyReport = await getLineDiscrepancyReport(purchaseOrderId);
+    // Get reports for each PO line
+    const lineDiscrepancyReport = await getLineReports(purchaseOrderId);
     
     // Return a summary of the purchase order
     return lineDiscrepancyReport.reduce<PurchaseOrderSummary>(
@@ -124,18 +124,18 @@ export async function purchaseOrderRequiresReview(
     orderId: number
 ): Promise<boolean> {
     // Check if purchase order has discrepancies and return matching lines
-    const discrepancyReports = await getLineDiscrepancyReport(orderId);
+    const lineReports = await getLineReports(orderId);
 
     // Return results which have discrepancies
-    return discrepancyReports.some(result => result.status !== "match");    
+    return lineReports.some(result => result.status !== "match");    
 }
 
-// Process Receipt function
+// Process receipt function
 export async function processReceipt(
     lineId: number,
     received: number,
     damaged: number
-): Promise<DiscrepancyResult | undefined> {
+): Promise<LineResult | undefined> {
 
     // Send to repository
     const updatedLine = await updateReceiptQuantities(

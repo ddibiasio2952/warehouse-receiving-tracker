@@ -8,20 +8,8 @@ import {
 } from "../types/types";
 
 import {
-    getLineDiscrepancyReport
+    getLineReports 
 } from "../services/purchaseOrderService";
-
-
-// Summarize a purchase order
-/*
-export async function summarizePurchaseOrder(
-    purchaseOrderId: number
-): Promise<PurchaseOrderSummary> {
-    const discrepancies = getPurchaseOrderDiscrepancies(purchaseOrderId);
-
-    return 
-}
-*/
 
 // Update receipt quantities
 export async function updateReceiptQuantities(
@@ -91,6 +79,43 @@ export async function getPurchaseOrderLinesByOrderId(
     }));
 }
 
+// Retrieve a single purchase order line
+/*export async function getOrderLinesByOrderId(
+    purchaseOrderId: number
+): Promise<PurchaseOrderLine | undefined> {
+    const pool = await getPool();
+
+    const result = await pool
+        .request()
+        .input(
+            "purchaseOrderId",
+            sql.Int,
+            purchaseOrderId
+        )
+        .query<PurchaseOrderLine>(`
+            SELECT
+                Id AS id,
+                PurchaseOrderId AS purchaseOrderId,
+                SkuId AS skuId,
+                ExpectedQuantity AS expectedQuantity,
+                ReceivedQuantity AS receivedQuantity,
+                DamagedQuantity AS damagedQuantity
+            FROM PurchaseOrderLines
+            WHERE PurchaseOrderId = @purchaseOrderId
+            ORDER BY Id;
+        `);
+
+    // Return with all numerical values set as number types
+    return result.recordset.map(line => ({
+        id: Number(line.id),
+        purchaseOrderId: Number(line.purchaseOrderId),
+        skuId: Number(line.skuId),
+        expectedQuantity: Number(line.expectedQuantity),
+        receivedQuantity: Number(line.receivedQuantity),
+        damagedQuantity: Number(line.damagedQuantity)
+    }));
+}*/
+
 // Retrieve all purchase order lines
 export async function getAllPurchaseOrderLines():
     Promise<PurchaseOrderLine[]> {
@@ -129,9 +154,7 @@ export async function purchaseOrderExists(
 
     const result = await pool
         .request()
-        .input(
-            "purchaseOrderId", sql.Int, purchaseOrderId        
-        )
+        .input("purchaseOrderId", sql.Int, purchaseOrderId)
         .query<{ recordExists: number }>(`
             SELECT
                 CASE

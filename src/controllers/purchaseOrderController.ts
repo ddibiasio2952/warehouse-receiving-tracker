@@ -18,21 +18,20 @@ import { ReceiptRequestBody } from "../types/types";
 import {
     summarizePurchaseOrder,
     processReceipt,
-    getPurchaseOrdersToReview
+    getPurchaseOrdersToReview,
+    getLineReports 
 } from "../services/purchaseOrderService";
 
 // Import repository operations
 import {
-    getAllPurchaseOrderLines,
-    purchaseOrderExists
+    purchaseOrderExists,
+    getAllPurchaseOrderLines
 } from "../repositories/purchaseOrderRepository";
-
-
 
 // Create a router for PO endpoints
 const purchaseOrderRouter: Router = Router();
 
-// Handle a request for a PO summary
+// Get a PO summary
 export async function getPurchaseOrderSummary(
     request: Request<{ id: string }>,
     response: Response
@@ -43,11 +42,11 @@ export async function getPurchaseOrderSummary(
     const exists = await purchaseOrderExists(purchaseOrderId);
     // Verify purchase order exists
     if (!exists) {
-    response.status(404).json({
-        message: "Purchase order not found."
-    });
-    return;
-}
+        response.status(404).json({
+            message: "Purchase order not found."
+        });
+        return;
+    }
 
     try {
         // Generate and return PO summary
@@ -72,8 +71,7 @@ export async function getPurchaseOrderSummary(
     }
 }
 
-// Handle a function to get purchase orders for review
-
+// Get all purchase orders for review
 export async function getPurchaseOrdersForReview(
     request: Request,
     response: Response
@@ -84,6 +82,14 @@ export async function getPurchaseOrdersForReview(
 
         // Run business logic on lines
         const result = await getPurchaseOrdersToReview(lines);
+
+        // Return error if result is undefined
+        if (result === undefined) {
+            response.status(404).json({
+                message: "Purchase order lines not found."
+            });
+            return;
+        }
 
         response.status(200).json(result);
 
@@ -96,7 +102,47 @@ export async function getPurchaseOrdersForReview(
     }
 }
 
-// Handle a request to post a receipt
+// Get all line reports for a PO
+export async function getLineReportsByPurchaseOrderId(
+    request: Request<{ id: string }>,
+    response: Response
+): Promise<void> {
+    // Convert route param from string to number
+    const orderId: number = Number(request.params.id);
+
+    // Validate Id
+    if (!isPositiveInteger(orderId)) {
+        response.status(400).json({
+            message: "Purchase order Id must be a positive integer."
+        });
+        return;
+    }
+
+    try {
+        // Verify purchase order exists
+        const exists = await purchaseOrderExists(orderId);
+
+        if (!exists) {
+            response.status(404).json({
+                message: "Purchase order not found."
+            });
+            return
+        }
+
+        const result = await getLineReports(orderId);
+
+        response.status(200).json(result);
+    } catch (error) {
+
+        console.error("Error retrieving purchase order line report: ", error);
+
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
+    }
+}
+
+// Post a PO line receipt
 export async function postReceipt(
     request: Request<
         { id: string },
@@ -129,11 +175,11 @@ export async function postReceipt(
             });
             return;
         }
-        
+
         // Run business logic
         const result = await processReceipt(
-            lineId, 
-            received, 
+            lineId,
+            received,
             damaged
         );
 
