@@ -17,12 +17,6 @@ export interface PurchaseOrder {
     expectedDate: string;
 }
 
-export interface PendingPurchaseOrder {
-    supplier: string;
-    status: PurchaseOrderStatus;
-    expectedDate: string;
-}
-
 export interface PurchaseOrderLine {
     id: number;
     purchaseOrderId: number;
@@ -65,3 +59,8 @@ export interface ReceiptRequestBody {
     damaged: number;
 }
 
+export interface PurchaseOrderLineBody {
+    purchaseOrderId: number;
+    skuId: number;
+    expectedQuantity: number;
+}

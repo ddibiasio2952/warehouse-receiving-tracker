@@ -16,6 +16,7 @@ import {
 // Import sample PO data
 import {
     PurchaseOrderBody,
+    PurchaseOrderLineBody,
     ReceiptRequestBody
 } from "../types/types";
 
@@ -198,7 +199,7 @@ export async function postOrder(
     const cleanedDate = expectedDate.trim();
 
     // Validate supplier is from list
-    // FUTURE IMPROEMENT: Add supplier entry to database and confirm with repository call
+    // FUTURE IMPROVEMENT: Add supplier entry to database and confirm with repository call
     if (!validateSupplier(cleanedSupplier)) {
         response.status(400).json({
             message: "Supplier must be from approved list."
@@ -240,6 +241,18 @@ export async function postOrder(
     }
 }
 
+// Post a PO line to a PO
+export async function postOrderLine(
+    request: Request,
+    response: Response
+) {
+    try {
+
+    } catch (error) {
+
+    }
+}
+
 // Post a PO line receipt
 export async function postReceipt(
     request: Request<
@@ -259,7 +272,7 @@ export async function postReceipt(
         // Validate Id
         if (!isPositiveInteger(lineId)) {
             response.status(400).json({
-                message: "Purchase order Id must be a positive integer."
+                message: "Purchase order line Id must be a positive integer."
             });
             return;
         }
@@ -274,11 +287,15 @@ export async function postReceipt(
             return;
         }
 
+        const receiptRequest: ReceiptRequestBody = {
+            received: received,
+            damaged: damaged
+        }
+
         // Run business logic
         const result = await processReceipt(
             lineId,
-            received,
-            damaged
+            receiptRequest
         );
 
         // Return error if result is undefined

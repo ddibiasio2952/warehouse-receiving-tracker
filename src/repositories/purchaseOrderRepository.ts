@@ -9,7 +9,9 @@ import {
     PurchaseOrder,
     PurchaseOrderBody,
     PurchaseOrderLine,
-    PurchaseOrderStatus
+    PurchaseOrderLineBody,
+    PurchaseOrderStatus,
+    ReceiptRequestBody
 } from "../types/types";
 
 import {
@@ -239,16 +241,15 @@ export async function addPurchaseOrder(
 // Update receipt quantities
 export async function updateReceiptQuantities(
     lineId: number,
-    received: number,
-    damaged: number
+    data: ReceiptRequestBody
 ): Promise<PurchaseOrderLine | undefined> {
     const pool = await getPool();
 
     const result = await pool
         .request()
         .input("lineId", sql.Int, lineId)
-        .input("received", sql.Int, received)
-        .input("damaged", sql.Int, damaged)
+        .input("received", sql.Int, data.received)
+        .input("damaged", sql.Int, data.damaged)
         .query<PurchaseOrderLine>(`
             UPDATE PurchaseOrderLines
             SET

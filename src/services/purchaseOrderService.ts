@@ -1,8 +1,9 @@
 import { 
     LineStatus,
-    PurchaseOrderLine,
     LineResult,
-    PurchaseOrderSummary
+    PurchaseOrderLine,
+    PurchaseOrderSummary,
+    ReceiptRequestBody
  } from "../types/types";
 
 import {
@@ -133,15 +134,13 @@ export async function purchaseOrderRequiresReview(
 // Process receipt function
 export async function processReceipt(
     lineId: number,
-    received: number,
-    damaged: number
+    data: ReceiptRequestBody
 ): Promise<LineResult | undefined> {
 
     // Send to repository
     const updatedLine = await updateReceiptQuantities(
         lineId,
-        received,
-        damaged
+        data
     );
 
     // Validate lineId

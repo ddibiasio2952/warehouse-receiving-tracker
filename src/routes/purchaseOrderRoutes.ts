@@ -8,6 +8,7 @@ import {
     getLineReportsByPurchaseOrderId,
     getPurchaseOrdersForReview,
     postOrder,
+    postOrderLine,
     postReceipt
 } from "../controllers/purchaseOrderController";
 
@@ -42,6 +43,12 @@ purchaseOrderRouter.get(
 purchaseOrderRouter.post(
     "/new-order",
     postOrder
+)
+
+// POST /api/purchase-orders/:id/lines
+purchaseOrderRouter.post(
+    "/:id/lines",
+    postOrderLine
 )
 
 // POST /api/purchase-orders/:id/receipt
