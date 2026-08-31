@@ -5,7 +5,7 @@ import {
     type Response
 } from "express";
 
-// Import Validation Functions
+// Import validation functions
 import {
     isPositiveInteger,
     validateQuantities,
@@ -13,10 +13,11 @@ import {
     validateDate
 } from "../utilities/validation";
 
-// Import sample PO data
+// Import types
 import {
     PurchaseOrderBody,
     PurchaseOrderLineBody,
+    PurchaseOrderLineRequestBody,
     ReceiptRequestBody
 } from "../types/types";
 
@@ -33,7 +34,9 @@ import {
     getPurchaseOrders,
     purchaseOrderExists,
     getAllPurchaseOrderLines,
-    addPurchaseOrder
+    getPurchaseOrderLine,
+    addPurchaseOrder,
+    addPurchaseOrderLine
 } from "../repositories/purchaseOrderRepository";
 
 // Create a router for PO endpoints
@@ -51,7 +54,7 @@ export async function getAllPurchaseOrders(
         response.status(200).json(result);
 
     } catch (error) {
-        console.error("Error retrieving  all purchase orders: ", error);
+        console.error("Error retrieving all purchase orders: ", error);
 
         response.status(500).json({
             message: "An internal server error occurred."
@@ -99,7 +102,7 @@ export async function getPurchaseOrderSummary(
     }
 }
 
-// Get all purchase orders for review
+// Get all POs for review
 export async function getPurchaseOrdersForReview(
     request: Request,
     response: Response
@@ -161,8 +164,44 @@ export async function getLineReportsByPurchaseOrderId(
 
         response.status(200).json(result);
     } catch (error) {
-
         console.error("Error retrieving purchase order line report: ", error);
+
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
+    }
+}
+
+// Get PO line by line Id
+export async function getLineByLineId(
+    request: Request<{ id: string }>,
+    response: Response
+): Promise<void> {
+    // Convert route param from string to number
+    const lineId: number = Number(request.params.id);
+
+    // Validate Id
+    if (!isPositiveInteger(lineId)) {
+        response.status(400).json({
+            message: "Line Id must be a positive integer."
+        });
+        return;
+    }
+
+    try {
+        const result = await getPurchaseOrderLine(lineId);
+
+        // Return error if result is undefined
+        if (result === undefined) {
+            response.status(404).json({
+                message: "Purchase order line not found."
+            });
+            return;
+        }
+
+        response.status(200).json(result);
+    } catch (error) {
+        console.error("Error retrieving purchase order line: ", error);
 
         response.status(500).json({
             message: "An internal server error occurred."
@@ -182,7 +221,7 @@ export async function postOrder(
     // Retrieve body values
     const { supplier, expectedDate } = request.body ?? {};
 
-    // Verify data strings are strings and not empty
+    // Verify data are strings and not empty
     if (
         typeof supplier !== "string" ||
         supplier.trim() === "" ||
@@ -243,18 +282,61 @@ export async function postOrder(
 
 // Post a PO line to a PO
 export async function postOrderLine(
-    request: Request,
+    request: Request<
+        { id: string },
+        unknown,
+        PurchaseOrderLineRequestBody
+    >,
     response: Response
-) {
+): Promise<void> {
+    // Convert route param from string to number
+    const orderId = Number(request.params.id);
+
+    // Retrieve body values
+    const { skuId, expectedQuantity } = request.body ?? {};
+
+    // Validate all numerical values are positive
+    if (
+        !isPositiveInteger(orderId) ||
+        !isPositiveInteger(skuId) ||
+        !isPositiveInteger(expectedQuantity)
+    ) {
+        response.status(400).json({
+            message: "Numerical values must be positive integers."
+        });
+        return;
+    }
+
+    const cleanedData: PurchaseOrderLineBody = {
+        purchaseOrderId: orderId,
+        skuId: skuId,
+        expectedQuantity: expectedQuantity
+    };
+
     try {
+        const result = await addPurchaseOrderLine(cleanedData);
+
+        // Return error if result is undefined
+        if (result === undefined) {
+            response.status(404).json({
+                message: "Purchase order or SKU not found."
+            });
+            return;
+        }
+
+        response.status(201).json(result);
 
     } catch (error) {
+        console.error("Error posting purchase order line: ", error);
 
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
     }
 }
 
-// Post a PO line receipt
-export async function postReceipt(
+// Put a PO line receipt
+export async function putLineReceipt(
     request: Request<
         { id: string },
         unknown,
@@ -262,40 +344,39 @@ export async function postReceipt(
     >,
     response: Response
 ): Promise<void> {
+    // Convert route param from string to number
+    const lineId = Number(request.params.id);
+
+    // Retrieve body values
+    const { received, damaged } = request.body ?? {};
+
+    // Validate Id
+    if (!isPositiveInteger(lineId)) {
+        response.status(400).json({
+            message: "Purchase order line Id must be a positive integer."
+        });
+        return;
+    }
+
+    // Validate quantities
+    if (!validateQuantities(received, damaged)) {
+        response.status(400).json({
+            message: "Received and damaged quantities " +
+                "must be non-negative integers, " +
+                "and damaged cannot exceed received."
+        });
+        return;
+    }
+
+    const cleanedData: ReceiptRequestBody = {
+        received: received,
+        damaged: damaged
+    }
     try {
-        // Convert route param from string to number
-        const lineId = Number(request.params.id);
-
-        // Retrieve body values
-        const { received, damaged } = request.body;
-
-        // Validate Id
-        if (!isPositiveInteger(lineId)) {
-            response.status(400).json({
-                message: "Purchase order line Id must be a positive integer."
-            });
-            return;
-        }
-
-        // Validate quantities
-        if (!validateQuantities(received, damaged)) {
-            response.status(400).json({
-                message: "Received and damaged quantities " +
-                    "must be non-negative integers, " +
-                    "and damaged cannot exceed received."
-            });
-            return;
-        }
-
-        const receiptRequest: ReceiptRequestBody = {
-            received: received,
-            damaged: damaged
-        }
-
         // Run business logic
         const result = await processReceipt(
             lineId,
-            receiptRequest
+            cleanedData
         );
 
         // Return error if result is undefined

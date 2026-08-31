@@ -14,11 +14,7 @@ import {
     ReceiptRequestBody
 } from "../types/types";
 
-import {
-    getLineReports
-} from "../services/purchaseOrderService";
-
-// Retrieve every purchase order
+// Retrieve all purchase orders
 export async function getPurchaseOrders():
     Promise<PurchaseOrder[]> {
     const pool = await getPool();
@@ -87,45 +83,6 @@ export async function getPurchaseOrderLinesByOrderId(
     }));
 }
 
-// Retrieve a single purchase order line
-/*export async function getOrderLinesByOrderId(
-    purchaseOrderId: number
-): Promise<PurchaseOrderLine | undefined> {
-    const pool = await getPool();
-
-    const result = await pool
-        .request()
-        .input(
-            "purchaseOrderId",
-            sql.Int,
-            purchaseOrderId
-        )
-        .query<PurchaseOrderLine>(`
-            SELECT
-                Id AS id,
-                PurchaseOrderId AS purchaseOrderId,
-                SkuId AS skuId,
-                ExpectedQuantity AS expectedQuantity,
-                ReceivedQuantity AS receivedQuantity,
-                DamagedQuantity AS damagedQuantity,
-                ReceiptRecorded AS receiptRecorded
-            FROM PurchaseOrderLines
-            WHERE PurchaseOrderId = @purchaseOrderId
-            ORDER BY Id;
-        `);
-
-    // Return with all numerical values set as number types
-    return result.recordset.map(line => ({
-        id: Number(line.id),
-        purchaseOrderId: Number(line.purchaseOrderId),
-        skuId: Number(line.skuId),
-        expectedQuantity: Number(line.expectedQuantity),
-        receivedQuantity: Number(line.receivedQuantity),
-        damagedQuantity: Number(line.damagedQuantity)
-        receiptRecorded: Boolean(line.receiptRecorded)
-    }));
-}*/
-
 // Retrieve all purchase order lines
 export async function getAllPurchaseOrderLines():
     Promise<PurchaseOrderLine[]> {
@@ -158,6 +115,45 @@ export async function getAllPurchaseOrderLines():
     }));
 }
 
+// Retrieve a purchase order line by Id
+export async function getPurchaseOrderLine(lineId: number): 
+    Promise<PurchaseOrderLine | undefined> {
+
+    const pool = await getPool();
+    
+    const result = await pool
+        .request()
+        .input("lineId", sql.Int, lineId)
+        .query<PurchaseOrderLine>(`
+            SELECT
+                Id AS id,
+                PurchaseOrderId AS purchaseOrderId,
+                SkuId AS skuId,
+                ExpectedQuantity AS expectedQuantity,
+                ReceivedQuantity AS receivedQuantity,
+                DamagedQuantity AS damagedQuantity,
+                ReceiptRecorded AS receiptRecorded
+            FROM PurchaseOrderLines
+            WHERE Id = @lineId
+        `);
+    
+    const line = result.recordset[0];
+
+    if (line === undefined) {
+        return undefined;
+    }
+
+    return { 
+        id: Number(line.id),
+        purchaseOrderId: Number(line.purchaseOrderId),
+        skuId: Number(line.skuId),
+        expectedQuantity: Number(line.expectedQuantity),
+        receivedQuantity: Number(line.receivedQuantity),
+        damagedQuantity: Number(line.damagedQuantity),
+        receiptRecorded: Boolean(line.receiptRecorded)
+    };
+}
+
 // Verify that purchase order exists in the database
 export async function purchaseOrderExists(
     purchaseOrderId: number
@@ -185,12 +181,12 @@ export async function purchaseOrderExists(
 
 // Add a purchase order
 export async function addPurchaseOrder(
-    cleanedData: PurchaseOrderBody
+    data: PurchaseOrderBody
 ): Promise<PurchaseOrder | undefined> {
     const pool = await getPool();
 
-    // Destructure cleaned data
-    const { supplier, status, expectedDate } = cleanedData;
+    // Destructure data
+    const { supplier, status, expectedDate } = data;
 
     // Convert date to Date Value
     const expectedDateValue =
@@ -235,6 +231,52 @@ export async function addPurchaseOrder(
             newOrder.expectedDate
                 .toISOString()
                 .slice(0, 10)
+    };
+}
+
+// Add a purchase order line
+export async function addPurchaseOrderLine(
+    data: PurchaseOrderLineBody
+): Promise<PurchaseOrderLine | undefined> {
+    const pool = await getPool();
+
+    const result = await pool
+        .request()
+        .input("purchaseOrderId", sql.Int, data.purchaseOrderId)
+        .input("skuId", sql.Int, data.skuId)
+        .input("expectedQuantity", sql.Int, data.expectedQuantity)
+        .query<PurchaseOrderLine>(`
+            INSERT INTO PurchaseOrderLines
+                (purchaseOrderId, skuId, expectedQuantity)
+            OUTPUT
+                INSERTED.Id AS id,
+                INSERTED.PurchaseOrderId AS purchaseOrderId,
+                INSERTED.SkuId AS skuId,
+                INSERTED.ExpectedQuantity AS expectedQuantity,
+                INSERTED.ReceivedQuantity AS receivedQuantity,
+                INSERTED.DamagedQuantity AS damagedQuantity,
+                INSERTED.ReceiptRecorded AS receiptRecorded
+            VALUES (
+                @purchaseOrderId,
+                @skuId,
+                @expectedQuantity
+            );
+        `);
+
+    const newOrderLine = result.recordset[0];
+
+    if (newOrderLine === undefined) {
+        return undefined;
+    }
+
+    return { 
+        id: Number(newOrderLine.id),
+        purchaseOrderId: Number(newOrderLine.purchaseOrderId),
+        skuId: Number(newOrderLine.skuId),
+        expectedQuantity: Number(newOrderLine.expectedQuantity),
+        receivedQuantity: Number(newOrderLine.receivedQuantity),
+        damagedQuantity: Number(newOrderLine.damagedQuantity),
+        receiptRecorded: Boolean(newOrderLine.receiptRecorded)
     };
 }
 

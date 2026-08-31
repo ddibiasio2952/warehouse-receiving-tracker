@@ -22,7 +22,7 @@ export function validateSupplier(supplier: string): supplier is Supplier {
 
 // Validate a date is in the future
 export function validateDate(date: string): boolean {
-    // Pattern: Year-Month-Day
+    // Allow numeric YYYY-MM-DD
     const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 
     // Verify date fits pattern
@@ -38,4 +38,22 @@ export function validateDate(date: string): boolean {
     }
 
     return dateValue > new Date();
+}
+
+// Validate a SKU's number format
+export function validateSkuNumber(skuNumber: string): boolean {
+    // Allow four uppercase letters and three numbers
+    const numberPattern = /^[A-Z]{4}\d{3}$/;
+
+    // Verify SKU number fits pattern
+    return numberPattern.test(skuNumber);
+}
+
+// Validate a SKU's description
+export function validateSkuDescription(skuDescription: string): boolean {
+    // Allow letters, numbers, spaces, and hyphens
+    const descriptionPattern = /^[A-Za-z0-9 -]+$/;
+
+    // Verify SKU description fits pattern
+    return descriptionPattern.test(skuDescription);
 }

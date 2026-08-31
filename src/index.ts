@@ -1,4 +1,6 @@
+// Import Routers
 import purchaseOrderRouter from "./routes/purchaseOrderRoutes";
+import skuRouter from "./routes/skuRoutes";
 
 /* SERVER BOILERPLATE */
 // Import Express framework
@@ -21,6 +23,11 @@ app.use(express.json());
 app.use(
     "/api/purchase-orders",
     purchaseOrderRouter
+);
+
+app.use(
+    "/api/skus",
+    skuRouter
 );
 
 // Define a GET endpoint for root URL

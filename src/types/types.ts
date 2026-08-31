@@ -10,6 +10,11 @@ export interface Sku {
     description: string;
 }
 
+export interface SkuRequestBody {
+    skuNumber: string;
+    description: string;
+}
+
 export interface PurchaseOrder {
     id: number;
     supplier: string;
@@ -61,6 +66,11 @@ export interface ReceiptRequestBody {
 
 export interface PurchaseOrderLineBody {
     purchaseOrderId: number;
+    skuId: number;
+    expectedQuantity: number;
+}
+
+export interface PurchaseOrderLineRequestBody {
     skuId: number;
     expectedQuantity: number;
 }
