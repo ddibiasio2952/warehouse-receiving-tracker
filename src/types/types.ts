@@ -1,25 +1,42 @@
 /* TYPES */
 export type PurchaseOrderStatus = "open" | "received" | "resolved" | "closed";
 export type LineStatus = "shortage" | "overage" | "match";
-export type Supplier = "Victoria Bay" | "Novolex" | "Dart";
 
 /* INTERFACES */
 export interface Sku {
     id: number;
     skuNumber: string;
     description: string;
+    supplierId: number;
 }
 
 export interface SkuRequestBody {
     skuNumber: string;
     description: string;
+    supplierId: number;
+}
+
+export interface SkuRetrieveBody {
+    id: number;
+    skuNumber: string;
+    description: string;
+    supplierId: number;
+    supplierName: string;
 }
 
 export interface PurchaseOrder {
     id: number;
-    supplier: string;
     status: PurchaseOrderStatus;
     expectedDate: string;
+    supplierId: number;
+}
+
+export interface PurchaseOrderDetails {
+    id: number;
+    status: PurchaseOrderStatus;
+    expectedDate: string;
+    supplierId: number;
+    supplierName: string;
 }
 
 export interface PurchaseOrderLine {
@@ -32,8 +49,26 @@ export interface PurchaseOrderLine {
     receiptRecorded: boolean;
 }
 
+export interface PurchaseOrderLineDetails {
+    id: number;
+    purchaseOrderId: number;
+    supplierId: number;
+    supplierName: string;
+    skuId: number;
+    skuNumber: string;
+    skuDescription: string;
+    expectedQuantity: number;
+    receivedQuantity: number;
+    damagedQuantity: number;
+    receiptRecorded: boolean;
+}
+
 export interface LineResult {
     purchaseOrderLineId: number;
+    supplierId: number;
+    supplierName: string;
+    skuNumber: string;
+    skuDescription: string;
     expectedQuantity: number;
     receivedQuantity: number;
     damagedQuantity: number;
@@ -54,9 +89,9 @@ export interface PurchaseOrderSummary {
 }
 
 export interface PurchaseOrderBody {
-    supplier: string;
     status: PurchaseOrderStatus;
     expectedDate: string;
+    supplierId: number;
 }
 
 export interface ReceiptRequestBody {

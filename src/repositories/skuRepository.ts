@@ -21,7 +21,8 @@ export async function getSkus():
             SELECT
                 Id AS id,
                 SkuNumber AS skuNumber,
-                Description AS description                
+                Description AS description,
+                SupplierId as supplierId                
             FROM Skus
             ORDER BY Id 
         `);
@@ -29,7 +30,8 @@ export async function getSkus():
     return result.recordset.map(sku => ({
         id: Number(sku.id),
         skuNumber: sku.skuNumber,
-        description: sku.description
+        description: sku.description,
+        supplierId: sku.supplierId
     }));
 }
 
@@ -45,7 +47,8 @@ export async function getSku(skuId: number):
             SELECT
                 Id AS id,
                 SkuNumber AS skuNumber,
-                Description AS description
+                Description AS description,
+                SupplierId AS supplierId
             FROM Skus
             WHERE Id = @skuId
         `);
@@ -59,7 +62,8 @@ export async function getSku(skuId: number):
     return {
         id: Number(sku.id),
         skuNumber: sku.skuNumber,
-        description: sku.description
+        description: sku.description,
+        supplierId: sku.supplierId
     };
 }
 
@@ -73,16 +77,19 @@ export async function addSku(
         .request()
         .input("skuNumber", sql.NVarChar(7), data.skuNumber)
         .input("description", sql.NVarChar(255), data.description)
+        .input("supplierId", sql.Int, data.supplierId)
         .query<Sku>(`
             INSERT INTO Skus
-                (SkuNumber, Description)
+                (SkuNumber, Description, SupplierId)
             OUTPUT
                 INSERTED.Id AS id,
                 INSERTED.SkuNumber AS skuNumber,
-                INSERTED.Description AS description
+                INSERTED.Description AS description,
+                INSERTED.SupplierId AS supplierId
             VALUES (
                 @skuNumber,
-                @description
+                @description,
+                @supplierId
             );
         `);
     
@@ -95,7 +102,8 @@ export async function addSku(
     return {
         id: Number(newSku.id),
         skuNumber: newSku.skuNumber,
-        description: newSku.description
+        description: newSku.description,
+        supplierId: Number(newSku.supplierId)
     };
 }
 
@@ -110,15 +118,18 @@ export async function updateSku(
         .input("skuId", sql.Int, data.id)
         .input("skuNumber", sql.NVarChar(7), data.skuNumber)
         .input("description", sql.NVarChar(255), data.description)
+        .input("supplierId", sql.Int, data.supplierId)
         .query<Sku>(`
             UPDATE Skus
             SET
                 SkuNumber = @skuNumber,
-                Description = @description
+                Description = @description,
+                SupplierId = @supplierId
             OUTPUT
                 INSERTED.Id AS id,
                 INSERTED.SkuNumber AS skuNumber,
-                INSERTED.Description AS description
+                INSERTED.Description AS description,
+                INSERTED.SupplierId AS supplierId
             WHERE Id = @skuId;
         `);
 

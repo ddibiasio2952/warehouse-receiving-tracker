@@ -1,8 +1,8 @@
-import type { PurchaseOrder } from "../../../src/types/types";
+import type { PurchaseOrderDetails } from "../../../src/types/types";
 
 // Props
 type PurchaseOrderTableProps = {
-    purchaseOrders: PurchaseOrder[];
+    purchaseOrders: PurchaseOrderDetails[];
     onSelectOrder: (purchaseOrderId: number) => void;
 };
 
@@ -26,7 +26,7 @@ function PurchaseOrderTable({
                 {purchaseOrders.map((purchaseOrder) => (
                     <tr key={purchaseOrder.id}>
                         <td>{purchaseOrder.id}</td>
-                        <td>{purchaseOrder.supplier}</td>
+                        <td>{purchaseOrder.supplierName}</td>
                         <td>{purchaseOrder.status}</td>
                         <td>
                             {new Date(
