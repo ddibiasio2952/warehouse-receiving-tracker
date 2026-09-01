@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import type {
   PurchaseOrderDetails,
   LineResult,
@@ -36,6 +37,10 @@ function App() {
   // Store Id of selected purchase order
   const [selectedPurchaseOrderId, setSelectedPurchaseOrderId] =
     useState<number | null>(null);
+
+  // Store Supplier of selected purchase order
+  const [selectedSupplierName, setSelectedSupplierName] =
+    useState<string | null>(null);
 
   // Store selected purchase order's line reports
   const [lineReports, setLineReports] =
@@ -109,6 +114,15 @@ function App() {
     loadLineReports();
   }, [selectedPurchaseOrderId]);
 
+  // Store the selected purchase order and supplier
+  function handleSelectOrder(
+    purchaseOrderId: number,
+    supplierName: string
+  ): void {
+    setSelectedPurchaseOrderId(purchaseOrderId);
+    setSelectedSupplierName(supplierName);
+  }
+
   // Record a receipt and replace the matching line report
   async function handleReceiptSubmit(
     lineId: number,
@@ -157,15 +171,24 @@ function App() {
       {!isLoading && !errorMessage && (
         <PurchaseOrderTable
           purchaseOrders={purchaseOrders}
-          onSelectOrder={setSelectedPurchaseOrderId}
+          onSelectOrder={handleSelectOrder}
         />
       )}
 
-      {/* Identify selected purchase order */}
+      {/* Identify the selected purchase order */}
       {selectedPurchaseOrderId !== null && (
-        <p>
-          Selected Purchase Order ID: {selectedPurchaseOrderId}
-        </p>
+        <section>
+          <p>
+            Selected Purchase Order ID:{" "}
+            {selectedPurchaseOrderId}
+          </p>
+
+          <p>
+            Supplier: <span className="selected-supplier-name">
+                        {selectedSupplierName}
+                      </span>
+          </p>
+        </section>
       )}
 
       {/*

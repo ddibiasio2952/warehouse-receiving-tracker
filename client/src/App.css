@@ -1,6 +1,11 @@
 /* General Rules */
 .app-container {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .error-message {
@@ -30,6 +35,11 @@ ul {
   background-color: #eeeeee;
 }
 
+.selected-supplier-name {
+  font-weight: bold;
+  color: rgb(104, 21, 159);
+}
+
 /* Line Reports Table */
 .line-reports-table {
   margin: 1rem auto 0;
@@ -50,8 +60,18 @@ ul {
 /* Receipt Form */
 .receipt-form {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+}
+
+.receipt-form label {
+  margin-bottom: 0.2rem;
+  /* border: 0.1rem solid black; */
+}
+
+.receipt-form input {
+  margin-bottom: 0.5rem;
+  /* border: 0.1rem solid black; */
 }

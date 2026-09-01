@@ -3,7 +3,11 @@ import type { PurchaseOrderDetails } from "../../../src/types/types";
 // Props
 type PurchaseOrderTableProps = {
     purchaseOrders: PurchaseOrderDetails[];
-    onSelectOrder: (purchaseOrderId: number) => void;
+    onSelectOrder: (
+        purchaseOrderId: number,
+        supplierName: string
+    ) => void;
+
 };
 
 function PurchaseOrderTable({
@@ -19,6 +23,7 @@ function PurchaseOrderTable({
                     <th>Status</th>
                     <th>Expected Date</th>
                     <th>Actions</th>
+                    <th>Close Order</th>
                 </tr>
             </thead>
 
@@ -37,9 +42,19 @@ function PurchaseOrderTable({
                             <button
                                 type="button"
                                 // Send row ID back
-                                onClick={() => onSelectOrder(purchaseOrder.id)}
+                                onClick={() => onSelectOrder(
+                                    purchaseOrder.id,
+                                    purchaseOrder.supplierName)}
                             >
                                 View Lines
+                            </button>
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                // Send row ID back
+                            >
+                                Close Order
                             </button>
                         </td>
                     </tr>

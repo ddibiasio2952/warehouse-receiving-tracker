@@ -22,8 +22,8 @@ function LineReportTable({
                     <th>Line ID</th>
                     <th>Expected</th>
                     <th>Received</th>
-                    <th>Damaged</th>
                     <th>Usable</th>
+                    <th>Damaged</th>
                     <th>Difference</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -36,8 +36,8 @@ function LineReportTable({
                         <td>{lineReport.purchaseOrderLineId}</td>
                         <td>{lineReport.expectedQuantity}</td>
                         <td>{lineReport.receivedQuantity}</td>
-                        <td>{lineReport.damagedQuantity}</td>
                         <td>{lineReport.usableReceived}</td>
+                        <td>{lineReport.damagedQuantity}</td>
                         <td>{lineReport.difference}</td>
                         <td>{lineReport.status}</td>
                         <td>
