@@ -304,7 +304,7 @@ export async function updateReceiptQuantities(
                 INSERTED.SkuId AS skuId,
                 INSERTED.ExpectedQuantity AS expectedQuantity,
                 INSERTED.ReceivedQuantity AS receivedQuantity,
-                INSERTED.DamagedQuantity AS damagedQuantity
+                INSERTED.DamagedQuantity AS damagedQuantity,
                 INSERTED.ReceiptRecorded AS receiptRecorded
             WHERE Id = @lineId;
         `);

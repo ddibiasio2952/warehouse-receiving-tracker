@@ -231,6 +231,7 @@ export async function postOrder(
         response.status(400).json({
             message: "Data must be a string and not empty."
         });
+
         return;
     }
 
@@ -243,6 +244,7 @@ export async function postOrder(
         response.status(400).json({
             message: "Supplier must be from approved list."
         });
+
         return;
     }
 
@@ -251,6 +253,7 @@ export async function postOrder(
         response.status(400).json({
             message: "The expected date must be in the future and match format YYY-MM-DD."
         });
+
         return;
     }
 
@@ -267,6 +270,7 @@ export async function postOrder(
             response.status(500).json({
                 message: "The purchase order could not be created."
             });
+
             return;
         }
 
@@ -304,6 +308,7 @@ export async function postOrderLine(
         response.status(400).json({
             message: "Numerical values must be positive integers."
         });
+
         return;
     }
 
@@ -321,6 +326,7 @@ export async function postOrderLine(
             response.status(404).json({
                 message: "Purchase order or SKU not found."
             });
+
             return;
         }
 
@@ -355,6 +361,7 @@ export async function putLineReceipt(
         response.status(400).json({
             message: "Purchase order line Id must be a positive integer."
         });
+
         return;
     }
 
@@ -365,6 +372,7 @@ export async function putLineReceipt(
                 "must be non-negative integers, " +
                 "and damaged cannot exceed received."
         });
+
         return;
     }
 
@@ -384,6 +392,7 @@ export async function putLineReceipt(
             response.status(404).json({
                 message: "Purchase order line not found."
             });
+            
             return;
         }
 

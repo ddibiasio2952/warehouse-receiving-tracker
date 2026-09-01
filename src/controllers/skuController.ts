@@ -61,6 +61,7 @@ export async function getSkuById(
         response.status(400).json({
             message: "Sku Id must be a positive integer."
         });
+
         return;
     }
 
@@ -72,6 +73,7 @@ export async function getSkuById(
             response.status(404).json({
                 message: "Sku not found."
             });
+
             return;
         }
 
@@ -107,6 +109,7 @@ export async function postSku(
         response.status(400).json({
             message: "Data must be a string and not empty."
         });
+
         return;
     }
 
@@ -119,6 +122,7 @@ export async function postSku(
             message: "SKU Number must start with four uppercase letters " +
                 "and end with three numbers."
         });
+
         return;
     }
 
@@ -128,6 +132,7 @@ export async function postSku(
             message: "SKU description may only contain letters, numbers, spaces, " +
             "and hyphens."
         });
+
         return;
     }
 
@@ -144,6 +149,7 @@ export async function postSku(
             response.status(500).json({
                 message: "The SKU could not be added."
             });
+
             return;
         }
 
@@ -177,6 +183,7 @@ export async function putSku(
         response.status(400).json({
             message: "SKU Id must be a positive integer."
         });
+
         return;
     }
 
@@ -190,6 +197,7 @@ export async function putSku(
         response.status(400).json({
             message: "Data must be a string and not empty."
         });
+
         return;
     }
 
@@ -202,6 +210,7 @@ export async function putSku(
             message: "SKU Number must start with four uppercase letters " +
                 "and end with three numbers."
         });
+        
         return;
     }
 
@@ -211,6 +220,7 @@ export async function putSku(
             message: "SKU description may only contain letters, numbers, spaces, " +
             "and hyphens."
         });
+
         return;
     }
 
