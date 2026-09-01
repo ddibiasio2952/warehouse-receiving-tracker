@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type {
-  PurchaseOrder,
+  PurchaseOrderDetails,
   LineResult,
   ReceiptRequestBody
 } from "../../src/types/types";
@@ -23,7 +23,7 @@ import "./App.css";
 function App() {
   // Store the purchase orders returned by the API
   const [purchaseOrders, setPurchaseOrders] =
-    useState<PurchaseOrder[]>([]);
+    useState<PurchaseOrderDetails[]>([]);
 
   // Store an error message or null when no error exists
   const [errorMessage, setErrorMessage] =

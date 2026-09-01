@@ -1,12 +1,12 @@
 import type {
-    PurchaseOrder,
+    PurchaseOrderDetails,
     LineResult,
     ReceiptRequestBody
 } from "../../../src/types/types";
 
 // Retrieve every purchase order
 export async function getPurchaseOrders():
-    Promise<PurchaseOrder[]> {
+    Promise<PurchaseOrderDetails[]> {
     const response = await fetch("/api/purchase-orders");
 
     // Throw an error if request is unsuccessful
@@ -15,7 +15,7 @@ export async function getPurchaseOrders():
     }
 
     // Convert response into purchase order objects
-    const data: PurchaseOrder[] = await response.json();
+    const data: PurchaseOrderDetails[] = await response.json();
 
     return data;
 }
