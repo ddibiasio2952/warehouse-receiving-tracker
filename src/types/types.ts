@@ -1,5 +1,5 @@
 /* TYPES */
-export type PurchaseOrderStatus = "open" | "received" | "resolved" | "closed";
+export type PurchaseOrderStatus = "open" | "closed";
 export type LineStatus = "shortage" | "overage" | "match";
 
 /* INTERFACES */

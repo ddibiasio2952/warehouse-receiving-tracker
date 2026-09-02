@@ -35,7 +35,8 @@ import {
     getAllPurchaseOrderLines,
     getPurchaseOrderLine,
     addPurchaseOrder,
-    addPurchaseOrderLine
+    addPurchaseOrderLine,
+    closePurchaseOrder
 } from "../repositories/purchaseOrderRepository";
 
 import {
@@ -188,6 +189,7 @@ export async function getLineByLineId(
         response.status(400).json({
             message: "Line Id must be a positive integer."
         });
+
         return;
     }
 
@@ -199,6 +201,7 @@ export async function getLineByLineId(
             response.status(404).json({
                 message: "Purchase order line not found."
             });
+
             return;
         }
 
@@ -239,6 +242,7 @@ export async function postOrder(
             response.status(404).json({
                 message: "Supplier not found."
             });
+
             return;
         }
 
@@ -408,6 +412,46 @@ export async function putLineReceipt(
 
     } catch (error) {
         console.error("Error updating receipt: ", error);
+
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
+    }
+}
+
+// Patch a purchase order status as "closed"
+export async function closePurchaseOrderStatus(
+    request: Request <{ id: string }>,
+    response: Response
+): Promise<void> {
+    // Convert route param from string to number
+    const orderId = Number(request.params.id);
+
+    // Validate Id
+    if (!isPositiveInteger(orderId)) {
+        response.status(400).json({
+            message: "Order Id must be a positive integer."
+        });
+
+        return
+    }
+
+    try {
+        const result = await closePurchaseOrder(orderId);
+
+        // Return error if result is undefiend
+        if (result === undefined) {
+            response.status(404).json({
+                message: "Purchase order line not found."
+            });
+
+            return;
+        }
+
+        response.status(200).json(result);
+
+    } catch (error) {
+        console.error("Error updating purchase order status: ", error);
 
         response.status(500).json({
             message: "An internal server error occurred."

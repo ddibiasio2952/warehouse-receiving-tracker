@@ -7,12 +7,15 @@ type PurchaseOrderTableProps = {
         purchaseOrderId: number,
         supplierName: string
     ) => void;
-
+    onRequestCloseOrder: (
+        purchaseOrderId: number
+    ) => void;
 };
 
 function PurchaseOrderTable({
     purchaseOrders,
-    onSelectOrder
+    onSelectOrder,
+    onRequestCloseOrder
 }: PurchaseOrderTableProps) {
     return (
         <table className="purchase-orders-table">
@@ -41,7 +44,7 @@ function PurchaseOrderTable({
                         <td>
                             <button
                                 type="button"
-                                // Send row ID back
+                                // Send order Id back
                                 onClick={() => onSelectOrder(
                                     purchaseOrder.id,
                                     purchaseOrder.supplierName)}
@@ -52,7 +55,9 @@ function PurchaseOrderTable({
                         <td>
                             <button
                                 type="button"
-                                // Send row ID back
+                                // Send order Id back
+                                onClick={() => onRequestCloseOrder(
+                                    purchaseOrder.id)}
                             >
                                 Close Order
                             </button>

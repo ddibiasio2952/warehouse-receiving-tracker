@@ -78,7 +78,7 @@ export async function getPurchaseOrderLinesByOrderId(
                 PurchaseOrderLines.ReceiptRecorded AS receiptRecorded
             FROM PurchaseOrderLines
             INNER JOIN Skus
-                On PurchaseOrderLines.SkuId = Skus.Id
+                ON PurchaseOrderLines.SkuId = Skus.Id
             INNER JOIN Suppliers
                 ON Suppliers.Id = Skus.SupplierId
             WHERE PurchaseOrderLines.PurchaseOrderId = @purchaseOrderId
@@ -156,7 +156,7 @@ export async function getPurchaseOrderLine(lineId: number):
                 PurchaseOrderLines.ReceiptRecorded AS receiptRecorded
             FROM PurchaseOrderLines
             INNER JOIN Skus
-                On PurchaseOrderLines.SkuId = Skus.Id
+                ON PurchaseOrderLines.SkuId = Skus.Id
             INNER JOIN Suppliers
                 ON Suppliers.Id = Skus.SupplierId
             WHERE PurchaseOrderLines.Id = @lineId;
@@ -343,11 +343,71 @@ export async function updateReceiptQuantities(
                 PurchaseOrderLines.ReceiptRecorded AS receiptRecorded
             FROM PurchaseOrderLines
             INNER JOIN Skus
-                On PurchaseOrderLines.SkuId = Skus.Id
+                ON PurchaseOrderLines.SkuId = Skus.Id
             INNER JOIN Suppliers
                 ON Suppliers.Id = Skus.SupplierId
             WHERE PurchaseOrderLines.Id = @lineId;
         `);
+
+    return result.recordset[0];
+}
+
+// Open a purchase order
+export async function openPurchaseOrder(
+    orderId: number
+): Promise<PurchaseOrderDetails | undefined> {
+    const pool = await getPool();
+
+    const result = await pool
+        .request()
+        .input("orderId", sql.Int, orderId)
+        .query<PurchaseOrderDetails>(`
+            UPDATE PurchaseOrders
+            SET
+                status = 'open'
+            WHERE Id = @orderId;
+
+            SELECT
+                PurchaseOrders.Id AS id,
+                PurchaseOrders.Status AS status,
+                PurchaseOrders.ExpectedDate AS expectedDate,
+                PurchaseOrders.SupplierId AS supplierId,
+                Suppliers.Name AS supplierName
+            FROM PurchaseOrders
+            INNER JOIN Suppliers
+                ON PurchaseOrders.SupplierId = Suppliers.Id
+            WHERE PurchaseOrders.Id = @orderId
+        `)
+
+    return result.recordset[0];
+}
+
+// Close a purchase order
+export async function closePurchaseOrder(
+    orderId: number
+): Promise<PurchaseOrderDetails | undefined> {
+    const pool = await getPool();
+
+    const result = await pool
+        .request()
+        .input("orderId", sql.Int, orderId)
+        .query<PurchaseOrderDetails>(`
+            UPDATE PurchaseOrders
+            SET
+                status = 'closed'
+            WHERE Id = @orderId;
+
+            SELECT
+                PurchaseOrders.Id AS id,
+                PurchaseOrders.Status AS status,
+                PurchaseOrders.ExpectedDate AS expectedDate,
+                PurchaseOrders.SupplierId AS supplierId,
+                Suppliers.Name AS supplierName
+            FROM PurchaseOrders
+            INNER JOIN Suppliers
+                ON PurchaseOrders.SupplierId = Suppliers.Id
+            WHERE PurchaseOrders.Id = @orderId
+        `)
 
     return result.recordset[0];
 }

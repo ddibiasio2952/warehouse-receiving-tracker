@@ -39,7 +39,7 @@ export async function getLineReports(
     return data;
 }
 
-// Received received adn damaged quantities for one purchase order line
+// Record received and damaged quantities for one purchase order line
 export async function recordReceipt(
     lineId: number,
     receipt: ReceiptRequestBody
@@ -62,6 +62,28 @@ export async function recordReceipt(
 
     // Convert the response into an updated line result
     const data: LineResult = await response.json();
+
+    return data;
+}
+
+// Close a purchase order
+export async function closePurchaseOrder(
+    orderId: number
+): Promise<PurchaseOrderDetails> {
+    const response = await fetch(
+        `/api/purchase-orders/${orderId}/close`,
+        {
+            method: "PATCH"
+        }
+    );
+
+    // Throw an error if request is unsuccessful
+    if (!response.ok) {
+        throw new Error("Failed to record receipt.");
+    }
+
+    // Convert the response into an updated purchase order detail
+    const data: PurchaseOrderDetails = await response.json();
 
     return data;
 }

@@ -9,11 +9,13 @@ import type {
 import {
   getPurchaseOrders,
   getLineReports,
-  recordReceipt
+  recordReceipt,
+  closePurchaseOrder
 } from "./services/purchaseOrderApi";
 
 // Import tables
 import PurchaseOrderTable from "./components/PurchaseOrderTable";
+import CloseOrderForm from "./components/CloseOrderForm";
 import LineReportTable from "./components/LineReportTable";
 import ReceiptForm from "./components/ReceiptForm";
 
@@ -38,7 +40,11 @@ function App() {
   const [selectedPurchaseOrderId, setSelectedPurchaseOrderId] =
     useState<number | null>(null);
 
-  // Store Supplier of selected purchase order
+  // Store Id of purchase order to close
+  const [selectedCloseOrderId, setSelectedCloseOrderId] =
+    useState<number | null>(null);
+
+  // Store supplier of selected purchase order
   const [selectedSupplierName, setSelectedSupplierName] =
     useState<string | null>(null);
 
@@ -114,13 +120,39 @@ function App() {
     loadLineReports();
   }, [selectedPurchaseOrderId]);
 
-  // Store the selected purchase order and supplier
+  // Store the selected purchase order Id and supplier for line recall
   function handleSelectOrder(
     purchaseOrderId: number,
     supplierName: string
   ): void {
     setSelectedPurchaseOrderId(purchaseOrderId);
     setSelectedSupplierName(supplierName);
+  }
+
+  // Close a purchase order
+  async function handleCloseOrder(
+    purchaseOrderId: number
+  ): Promise<void> {
+    try {
+      const closedOrder = await closePurchaseOrder(purchaseOrderId);
+
+      // Update with newest report
+      setPurchaseOrders((currentPurchaseOrders) =>
+        currentPurchaseOrders.map((purchaseOrder) =>
+          purchaseOrder.id === purchaseOrderId
+            ? closedOrder
+            : purchaseOrder
+        )
+      );
+
+      // Clear the selectio nand remove the close order form
+      setSelectedCloseOrderId(null);
+
+    } catch (error) {
+      console.error("Error closing purchase order: ", error);
+
+      setLineErrorMessage("Unable to close the purchase order.");
+    }
   }
 
   // Record a receipt and replace the matching line report
@@ -142,8 +174,9 @@ function App() {
         )
       );
 
-      // Clear the selection and remove the receipt form.
+      // Clear the selection and remove the receipt form
       setSelectedLineId(null);
+
     } catch (error) {
       console.error("Error recording receipt: ", error);
 
@@ -167,11 +200,12 @@ function App() {
         <p className="error-message">{errorMessage}</p>
       )}
 
-      {/* Display the table after a successful request */}
+      {/* Display purchase order table after a successful request */}
       {!isLoading && !errorMessage && (
         <PurchaseOrderTable
           purchaseOrders={purchaseOrders}
           onSelectOrder={handleSelectOrder}
+          onRequestCloseOrder={setSelectedCloseOrderId}
         />
       )}
 
@@ -185,10 +219,18 @@ function App() {
 
           <p>
             Supplier: <span className="selected-supplier-name">
-                        {selectedSupplierName}
-                      </span>
+              {selectedSupplierName}
+            </span>
           </p>
         </section>
+      )}
+
+      {/* Display close order form */}
+      {selectedCloseOrderId !== null && (
+        <CloseOrderForm
+          orderId={selectedCloseOrderId}
+          onSubmit={handleCloseOrder}
+        />
       )}
 
       {/*

@@ -10,7 +10,8 @@ import {
     getPurchaseOrdersForReview,
     postOrder,
     postOrderLine,
-    putLineReceipt
+    putLineReceipt,
+    closePurchaseOrderStatus
 } from "../controllers/purchaseOrderController";
 
 // Create a router for purchase order endpoints
@@ -71,6 +72,13 @@ purchaseOrderRouter.put(
     "/lines/:id/receipt",
     putLineReceipt
 );
+
+// PATCH /api/purchase-orders/:id/close
+// Change the status of a purchase order to "closed"
+purchaseOrderRouter.patch(
+    "/:id/close",
+    closePurchaseOrderStatus
+)
 
 // Export
 export default purchaseOrderRouter;
