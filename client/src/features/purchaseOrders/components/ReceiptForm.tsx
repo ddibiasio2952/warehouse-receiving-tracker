@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { SubmitEvent  } from "react";
 import type {
     ReceiptRequestBody
-} from "../../../src/types/types";
+} from "../../../../../src/types/types";
 
 // Props
 type ReceiptFormProps = {
