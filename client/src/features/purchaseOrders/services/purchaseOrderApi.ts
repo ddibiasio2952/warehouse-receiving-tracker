@@ -2,7 +2,7 @@ import type {
     PurchaseOrderDetails,
     LineResult,
     ReceiptRequestBody
-} from "../../../src/types/types";
+} from "../../../../../src/types/types";
 
 // Retrieve every purchase order
 export async function getPurchaseOrders():

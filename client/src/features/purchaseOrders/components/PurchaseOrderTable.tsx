@@ -1,4 +1,4 @@
-import type { PurchaseOrderDetails } from "../../../src/types/types";
+import type { PurchaseOrderDetails } from "../../../../../src/types/types";
 
 // Props
 type PurchaseOrderTableProps = {
