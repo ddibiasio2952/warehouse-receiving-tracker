@@ -26,6 +26,10 @@ import {
     updateSku
 } from "../repositories/skuRepository";
 
+import {
+    supplierExists
+} from "../repositories/supplierRepository";
+
 // Create a router for SKU endpoints
 const skuRouter: Router = Router();
 
@@ -61,6 +65,7 @@ export async function getSkuById(
         response.status(400).json({
             message: "Sku Id must be a positive integer."
         });
+
         return;
     }
 
@@ -72,6 +77,7 @@ export async function getSkuById(
             response.status(404).json({
                 message: "Sku not found."
             });
+
             return;
         }
 
@@ -95,7 +101,25 @@ export async function postSku(
     response: Response
 ): Promise<void> {
     // Retrieve body values
-    const { skuNumber, description } = request.body ?? {};
+    const { skuNumber, description, supplierId } = request.body ?? {};
+
+    // Validate Supplier Id
+    if (!isPositiveInteger(supplierId)) {
+        response.status(400).json({
+            message: "Supplier Id must be a positive integer."
+        });
+
+        return;
+    }
+
+    // Verify supplier exists
+    const exists = await supplierExists(supplierId);
+    if (!exists) {
+        response.status(404).json({
+            message: "Supplier not found."
+        });
+        return;
+    }
 
     // Verify data are strings and not empty
     if (
@@ -107,6 +131,7 @@ export async function postSku(
         response.status(400).json({
             message: "Data must be a string and not empty."
         });
+
         return;
     }
 
@@ -119,6 +144,7 @@ export async function postSku(
             message: "SKU Number must start with four uppercase letters " +
                 "and end with three numbers."
         });
+
         return;
     }
 
@@ -126,14 +152,16 @@ export async function postSku(
     if (!validateSkuDescription(cleanedDescription)) {
         response.status(400).json({
             message: "SKU description may only contain letters, numbers, spaces, " +
-            "and hyphens."
+                "and hyphens."
         });
+
         return;
     }
 
     const cleanedData: SkuRequestBody = {
         skuNumber: cleanedNumber,
-        description: cleanedDescription
+        description: cleanedDescription,
+        supplierId: supplierId
     }
 
     try {
@@ -144,6 +172,7 @@ export async function postSku(
             response.status(500).json({
                 message: "The SKU could not be added."
             });
+
             return;
         }
 
@@ -160,9 +189,9 @@ export async function postSku(
 // Update SKU
 export async function putSku(
     request: Request<
-    { id: string },
-    unknown,
-    SkuRequestBody
+        { id: string },
+        unknown,
+        SkuRequestBody
     >,
     response: Response
 ): Promise<void> {
@@ -170,12 +199,31 @@ export async function putSku(
     const skuId = Number(request.params.id);
 
     // Retrieve body values
-    const { skuNumber, description } = request.body ?? {};
+    const { skuNumber, description, supplierId } = request.body ?? {};
 
-    // Validate Id
+    // Validate Ids
     if (!isPositiveInteger(skuId)) {
         response.status(400).json({
             message: "SKU Id must be a positive integer."
+        });
+
+        return;
+    }
+
+    // Validate Supplier Id
+    if (!isPositiveInteger(supplierId)) {
+        response.status(400).json({
+            message: "Supplier Id must be a positive integer."
+        });
+
+        return;
+    }
+
+    // Verify supplier exists
+    const exists = await supplierExists(supplierId);
+    if (!exists) {
+        response.status(404).json({
+            message: "Supplier not found."
         });
         return;
     }
@@ -190,6 +238,7 @@ export async function putSku(
         response.status(400).json({
             message: "Data must be a string and not empty."
         });
+
         return;
     }
 
@@ -202,6 +251,7 @@ export async function putSku(
             message: "SKU Number must start with four uppercase letters " +
                 "and end with three numbers."
         });
+
         return;
     }
 
@@ -209,22 +259,29 @@ export async function putSku(
     if (!validateSkuDescription(cleanedDescription)) {
         response.status(400).json({
             message: "SKU description may only contain letters, numbers, spaces, " +
-            "and hyphens."
+                "and hyphens."
         });
+
         return;
     }
 
     const cleanedData: Sku = {
         id: Number(skuId),
         skuNumber: cleanedNumber,
-        description: cleanedDescription
+        description: cleanedDescription,
+        supplierId: supplierId,
     }
 
     try {
         const result = await updateSku(cleanedData);
 
+        response.status(200).json(result);
     } catch (error) {
+        console.error("Error updating SKU: ", error);
 
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
     }
 }
 

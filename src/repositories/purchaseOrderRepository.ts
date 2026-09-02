@@ -8,7 +8,9 @@ import { getPool } from "../config/database";
 import {
     PurchaseOrder,
     PurchaseOrderBody,
+    PurchaseOrderDetails,
     PurchaseOrderLine,
+    PurchaseOrderLineDetails,
     PurchaseOrderLineBody,
     PurchaseOrderStatus,
     ReceiptRequestBody
@@ -21,25 +23,29 @@ export async function getPurchaseOrders():
 
     const result = await pool
         .request()
-        .query<PurchaseOrder>(`
+        .query<PurchaseOrderDetails>(`
             SELECT
-                Id AS id,
-                Supplier AS supplier,
-                Status AS status,
+                PurchaseOrders.Id AS id,
+                PurchaseOrders.Status AS status,
                 CONVERT(
                     VARCHAR(10),
-                    ExpectedDate,
+                    PurchaseOrders.ExpectedDate,
                     23
-                ) AS expectedDate
+                ) AS expectedDate,
+                PurchaseOrders.SupplierId AS supplierId,
+                Suppliers.Name AS supplierName
             FROM PurchaseOrders
+            INNER JOIN Suppliers
+                On PurchaseOrders.SupplierId = Suppliers.Id
             ORDER BY Id;
         `);
 
     return result.recordset.map(order => ({
         id: Number(order.id),
-        supplier: order.supplier,
         status: order.status,
-        expectedDate: order.expectedDate
+        expectedDate: order.expectedDate,
+        supplierId: order.supplierId,
+        supplierName: order.supplierName
     }));
 }
 
@@ -47,35 +53,46 @@ export async function getPurchaseOrders():
 // Retrieve every line belonging to one purchase order
 export async function getPurchaseOrderLinesByOrderId(
     purchaseOrderId: number
-): Promise<PurchaseOrderLine[]> {
+): Promise<PurchaseOrderLineDetails[]> {
     const pool = await getPool();
 
     const result = await pool
         .request()
         .input(
             "purchaseOrderId",
-            sql.Int,
+            sql.Int,    
             purchaseOrderId
         )
-        .query<PurchaseOrderLine>(`
+        .query<PurchaseOrderLineDetails>(`
             SELECT
-                Id AS id,
-                PurchaseOrderId AS purchaseOrderId,
-                SkuId AS skuId,
-                ExpectedQuantity AS expectedQuantity,
-                ReceivedQuantity AS receivedQuantity,
-                DamagedQuantity AS damagedQuantity,
-                ReceiptRecorded AS receiptRecorded
+                PurchaseOrderLines.Id AS id,
+                PurchaseOrderLines.PurchaseOrderId AS purchaseOrderId,
+                PurchaseOrderLines.SkuId AS skuId,
+                Suppliers.Id AS supplierId,
+                Suppliers.Name AS supplierName,
+                Skus.SkuNumber AS skuNumber,
+                Skus.Description AS skuDescription,
+                PurchaseOrderLines.ExpectedQuantity AS expectedQuantity,
+                PurchaseOrderLines.ReceivedQuantity AS receivedQuantity,
+                PurchaseOrderLines.DamagedQuantity AS damagedQuantity,
+                PurchaseOrderLines.ReceiptRecorded AS receiptRecorded
             FROM PurchaseOrderLines
-            WHERE PurchaseOrderId = @purchaseOrderId
-            ORDER BY Id;
+            INNER JOIN Skus
+                ON PurchaseOrderLines.SkuId = Skus.Id
+            INNER JOIN Suppliers
+                ON Suppliers.Id = Skus.SupplierId
+            WHERE PurchaseOrderLines.PurchaseOrderId = @purchaseOrderId
         `);
 
     // Return with all numerical values set as number types
     return result.recordset.map(line => ({
         id: Number(line.id),
         purchaseOrderId: Number(line.purchaseOrderId),
+        supplierId: Number(line.supplierId),
+        supplierName: line.supplierName,
         skuId: Number(line.skuId),
+        skuNumber: line.skuNumber,
+        skuDescription: line.skuDescription,
         expectedQuantity: Number(line.expectedQuantity),
         receivedQuantity: Number(line.receivedQuantity),
         damagedQuantity: Number(line.damagedQuantity),
@@ -117,24 +134,32 @@ export async function getAllPurchaseOrderLines():
 
 // Retrieve a purchase order line by Id
 export async function getPurchaseOrderLine(lineId: number): 
-    Promise<PurchaseOrderLine | undefined> {
+    Promise<PurchaseOrderLineDetails | undefined> {
 
     const pool = await getPool();
     
     const result = await pool
         .request()
         .input("lineId", sql.Int, lineId)
-        .query<PurchaseOrderLine>(`
+        .query<PurchaseOrderLineDetails>(`
             SELECT
-                Id AS id,
-                PurchaseOrderId AS purchaseOrderId,
-                SkuId AS skuId,
-                ExpectedQuantity AS expectedQuantity,
-                ReceivedQuantity AS receivedQuantity,
-                DamagedQuantity AS damagedQuantity,
-                ReceiptRecorded AS receiptRecorded
+                PurchaseOrderLines.Id AS id,
+                PurchaseOrderLines.PurchaseOrderId AS purchaseOrderId,
+                PurchaseOrderLines.SkuId AS skuId,
+                Suppliers.Id AS supplierId,
+                Suppliers.Name AS supplierName,
+                Skus.SkuNumber AS skuNumber,
+                Skus.Description AS skuDescription,
+                PurchaseOrderLines.ExpectedQuantity AS expectedQuantity,
+                PurchaseOrderLines.ReceivedQuantity AS receivedQuantity,
+                PurchaseOrderLines.DamagedQuantity AS damagedQuantity,
+                PurchaseOrderLines.ReceiptRecorded AS receiptRecorded
             FROM PurchaseOrderLines
-            WHERE Id = @lineId
+            INNER JOIN Skus
+                ON PurchaseOrderLines.SkuId = Skus.Id
+            INNER JOIN Suppliers
+                ON Suppliers.Id = Skus.SupplierId
+            WHERE PurchaseOrderLines.Id = @lineId;
         `);
     
     const line = result.recordset[0];
@@ -146,7 +171,11 @@ export async function getPurchaseOrderLine(lineId: number):
     return { 
         id: Number(line.id),
         purchaseOrderId: Number(line.purchaseOrderId),
+        supplierId: Number(line.supplierId),
+        supplierName: line.supplierName,
         skuId: Number(line.skuId),
+        skuNumber: line.skuNumber,
+        skuDescription: line.skuDescription,
         expectedQuantity: Number(line.expectedQuantity),
         receivedQuantity: Number(line.receivedQuantity),
         damagedQuantity: Number(line.damagedQuantity),
@@ -186,7 +215,7 @@ export async function addPurchaseOrder(
     const pool = await getPool();
 
     // Destructure data
-    const { supplier, status, expectedDate } = data;
+    const { supplierId, status, expectedDate } = data;
 
     // Convert date to Date Value
     const expectedDateValue =
@@ -194,26 +223,26 @@ export async function addPurchaseOrder(
 
     const result = await pool
         .request()
-        .input("supplier", sql.NVarChar(150), supplier)
         .input("status", sql.NVarChar(20), status)
         .input("expectedDate", sql.Date, expectedDateValue)
+        .input("supplierId", sql.Int, supplierId)
         .query<{
             id: number;
-            supplier: string;
             status: PurchaseOrderStatus;
             expectedDate: Date;
+            supplierId: number;
         }>(`
             INSERT INTO PurchaseOrders
-                (supplier, status, expectedDate)
+                (status, expectedDate, supplierId)
             OUTPUT
                 INSERTED.Id AS id,
-                INSERTED.Supplier AS supplier,
                 INSERTED.Status AS status,
-                INSERTED.ExpectedDate AS expectedDate
+                INSERTED.ExpectedDate AS expectedDate,
+                INSERTED.SupplierId AS supplierId
             VALUES (
-                @supplier,
                 @status,
-                @expectedDate
+                @expectedDate,
+                @supplierId
             );
         `);
 
@@ -225,12 +254,12 @@ export async function addPurchaseOrder(
 
     return {
         id: Number(newOrder.id),
-        supplier: newOrder.supplier,
         status: newOrder.status,
         expectedDate:
             newOrder.expectedDate
                 .toISOString()
-                .slice(0, 10)
+                .slice(0, 10),
+        supplierId: newOrder.supplierId
     };
 }
 
@@ -284,7 +313,7 @@ export async function addPurchaseOrderLine(
 export async function updateReceiptQuantities(
     lineId: number,
     data: ReceiptRequestBody
-): Promise<PurchaseOrderLine | undefined> {
+): Promise<PurchaseOrderLineDetails | undefined> {
     const pool = await getPool();
 
     const result = await pool
@@ -292,22 +321,93 @@ export async function updateReceiptQuantities(
         .input("lineId", sql.Int, lineId)
         .input("received", sql.Int, data.received)
         .input("damaged", sql.Int, data.damaged)
-        .query<PurchaseOrderLine>(`
+        .query<PurchaseOrderLineDetails>(`
             UPDATE PurchaseOrderLines
             SET
                 ReceivedQuantity = @received,
                 DamagedQuantity = @damaged,
                 ReceiptRecorded = 1
-            OUTPUT
-                INSERTED.Id AS id,
-                INSERTED.PurchaseOrderId AS purchaseOrderId,
-                INSERTED.SkuId AS skuId,
-                INSERTED.ExpectedQuantity AS expectedQuantity,
-                INSERTED.ReceivedQuantity AS receivedQuantity,
-                INSERTED.DamagedQuantity AS damagedQuantity
-                INSERTED.ReceiptRecorded AS receiptRecorded
             WHERE Id = @lineId;
+
+            SELECT
+                PurchaseOrderLines.Id AS id,
+                PurchaseOrderLines.PurchaseOrderId AS purchaseOrderId,
+                PurchaseOrderLines.SkuId AS skuId,
+                Suppliers.Id AS supplierId,
+                Suppliers.Name AS supplierName,
+                Skus.SkuNumber AS skuNumber,
+                Skus.Description AS skuDescription,
+                PurchaseOrderLines.ExpectedQuantity AS expectedQuantity,
+                PurchaseOrderLines.ReceivedQuantity AS receivedQuantity,
+                PurchaseOrderLines.DamagedQuantity AS damagedQuantity,
+                PurchaseOrderLines.ReceiptRecorded AS receiptRecorded
+            FROM PurchaseOrderLines
+            INNER JOIN Skus
+                ON PurchaseOrderLines.SkuId = Skus.Id
+            INNER JOIN Suppliers
+                ON Suppliers.Id = Skus.SupplierId
+            WHERE PurchaseOrderLines.Id = @lineId;
         `);
+
+    return result.recordset[0];
+}
+
+// Open a purchase order
+export async function openPurchaseOrder(
+    orderId: number
+): Promise<PurchaseOrderDetails | undefined> {
+    const pool = await getPool();
+
+    const result = await pool
+        .request()
+        .input("orderId", sql.Int, orderId)
+        .query<PurchaseOrderDetails>(`
+            UPDATE PurchaseOrders
+            SET
+                status = 'open'
+            WHERE Id = @orderId;
+
+            SELECT
+                PurchaseOrders.Id AS id,
+                PurchaseOrders.Status AS status,
+                PurchaseOrders.ExpectedDate AS expectedDate,
+                PurchaseOrders.SupplierId AS supplierId,
+                Suppliers.Name AS supplierName
+            FROM PurchaseOrders
+            INNER JOIN Suppliers
+                ON PurchaseOrders.SupplierId = Suppliers.Id
+            WHERE PurchaseOrders.Id = @orderId
+        `)
+
+    return result.recordset[0];
+}
+
+// Close a purchase order
+export async function closePurchaseOrder(
+    orderId: number
+): Promise<PurchaseOrderDetails | undefined> {
+    const pool = await getPool();
+
+    const result = await pool
+        .request()
+        .input("orderId", sql.Int, orderId)
+        .query<PurchaseOrderDetails>(`
+            UPDATE PurchaseOrders
+            SET
+                status = 'closed'
+            WHERE Id = @orderId;
+
+            SELECT
+                PurchaseOrders.Id AS id,
+                PurchaseOrders.Status AS status,
+                PurchaseOrders.ExpectedDate AS expectedDate,
+                PurchaseOrders.SupplierId AS supplierId,
+                Suppliers.Name AS supplierName
+            FROM PurchaseOrders
+            INNER JOIN Suppliers
+                ON PurchaseOrders.SupplierId = Suppliers.Id
+            WHERE PurchaseOrders.Id = @orderId
+        `)
 
     return result.recordset[0];
 }

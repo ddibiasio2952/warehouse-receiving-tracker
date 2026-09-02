@@ -1,5 +1,3 @@
-import { Supplier } from "../types/types";
-
 // Positive Integer Check for Id Validation
 export function isPositiveInteger(value: number): boolean {
     return Number.isInteger(value) && value > 0;
@@ -13,11 +11,6 @@ export function validateQuantities(received: number, damaged: number): boolean {
         received >= 0 &&
         damaged >= 0 &&
         received >= damaged);
-}
-
-// Validate supplier
-export function validateSupplier(supplier: string): supplier is Supplier {
-    return ["Victoria Bay", "Novolex", "Dart"].includes(supplier);
 }
 
 // Validate a date is in the future

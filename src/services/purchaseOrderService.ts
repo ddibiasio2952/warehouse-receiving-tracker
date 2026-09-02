@@ -2,6 +2,7 @@ import {
     LineStatus,
     LineResult,
     PurchaseOrderLine,
+    PurchaseOrderLineDetails,
     PurchaseOrderSummary,
     ReceiptRequestBody
  } from "../types/types";
@@ -15,7 +16,7 @@ import {
 
 // Calculate and return purchase order line's discrepancy
 export function calculateDiscrepancy(
-    line: PurchaseOrderLine
+    line: PurchaseOrderLineDetails
 ): LineResult {
     // Calculate the good received products
     const difference =
@@ -27,6 +28,10 @@ export function calculateDiscrepancy(
     // Return DiscrepancyResult
     return {
         purchaseOrderLineId: line.id,
+        supplierId: line.supplierId,
+        supplierName: line.supplierName,
+        skuNumber: line.skuNumber,
+        skuDescription: line.skuDescription,
         expectedQuantity: line.expectedQuantity,
         receivedQuantity: line.receivedQuantity,
         damagedQuantity: line.damagedQuantity,

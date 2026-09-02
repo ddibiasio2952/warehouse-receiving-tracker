@@ -9,7 +9,6 @@ import {
 import {
     isPositiveInteger,
     validateQuantities,
-    validateSupplier,
     validateDate
 } from "../utilities/validation";
 
@@ -36,13 +35,18 @@ import {
     getAllPurchaseOrderLines,
     getPurchaseOrderLine,
     addPurchaseOrder,
-    addPurchaseOrderLine
+    addPurchaseOrderLine,
+    closePurchaseOrder
 } from "../repositories/purchaseOrderRepository";
 
-// Create a router for PO endpoints
+import {
+    supplierExists
+} from "../repositories/supplierRepository";
+
+// Create a router for purchase order endpoints
 const purchaseOrderRouter: Router = Router();
 
-// Get all POs
+// Get all purchase orders
 export async function getAllPurchaseOrders(
     request: Request,
     response: Response
@@ -62,7 +66,7 @@ export async function getAllPurchaseOrders(
     }
 }
 
-// Get a PO summary
+// Get a purchase order summary
 export async function getPurchaseOrderSummary(
     request: Request<{ id: string }>,
     response: Response
@@ -70,8 +74,8 @@ export async function getPurchaseOrderSummary(
     // Convert route param from string to number
     const purchaseOrderId: number = Number(request.params.id);
 
-    const exists = await purchaseOrderExists(purchaseOrderId);
     // Verify purchase order exists
+    const exists = await purchaseOrderExists(purchaseOrderId);
     if (!exists) {
         response.status(404).json({
             message: "Purchase order not found."
@@ -80,7 +84,7 @@ export async function getPurchaseOrderSummary(
     }
 
     try {
-        // Generate and return PO summary
+        // Generate and return purchase order summary
         const result = await summarizePurchaseOrder(purchaseOrderId);
 
         // Return error if result is undefined
@@ -102,7 +106,7 @@ export async function getPurchaseOrderSummary(
     }
 }
 
-// Get all POs for review
+// Get all purchase orders for review
 export async function getPurchaseOrdersForReview(
     request: Request,
     response: Response
@@ -133,7 +137,7 @@ export async function getPurchaseOrdersForReview(
     }
 }
 
-// Get all line reports for a PO
+// Get all line reports for a purchase order
 export async function getLineReportsByPurchaseOrderId(
     request: Request<{ id: string }>,
     response: Response
@@ -172,7 +176,7 @@ export async function getLineReportsByPurchaseOrderId(
     }
 }
 
-// Get PO line by line Id
+// Get purchase order line by line Id
 export async function getLineByLineId(
     request: Request<{ id: string }>,
     response: Response
@@ -185,6 +189,7 @@ export async function getLineByLineId(
         response.status(400).json({
             message: "Line Id must be a positive integer."
         });
+
         return;
     }
 
@@ -196,6 +201,7 @@ export async function getLineByLineId(
             response.status(404).json({
                 message: "Purchase order line not found."
             });
+
             return;
         }
 
@@ -209,7 +215,7 @@ export async function getLineByLineId(
     }
 }
 
-// Post a new PO
+// Post a new purchase order
 export async function postOrder(
     request: Request<
         Record<string, never>,
@@ -219,43 +225,52 @@ export async function postOrder(
     response: Response
 ): Promise<void> {
     // Retrieve body values
-    const { supplier, expectedDate } = request.body ?? {};
+    const { supplierId, expectedDate } = request.body ?? {};
 
-    // Verify data are strings and not empty
+    // Validate Supplier Id
+        if (!isPositiveInteger(supplierId)) {
+            response.status(400).json({
+                message: "Supplier Id must be a positive integer."
+            });
+    
+            return;
+        }
+    
+        // Verify supplier exists
+        const exists = await supplierExists(supplierId);
+        if (!exists) {
+            response.status(404).json({
+                message: "Supplier not found."
+            });
+
+            return;
+        }
+
+    // Verify expected date is a string and not empty
     if (
-        typeof supplier !== "string" ||
-        supplier.trim() === "" ||
         typeof expectedDate !== "string" ||
         expectedDate.trim() === ""
     ) {
         response.status(400).json({
             message: "Data must be a string and not empty."
         });
+
         return;
     }
 
-    const cleanedSupplier = supplier.trim();
     const cleanedDate = expectedDate.trim();
-
-    // Validate supplier is from list
-    // FUTURE IMPROVEMENT: Add supplier entry to database and confirm with repository call
-    if (!validateSupplier(cleanedSupplier)) {
-        response.status(400).json({
-            message: "Supplier must be from approved list."
-        });
-        return;
-    }
 
     // Validate expectedDate is in the future
     if (!validateDate(cleanedDate)) {
         response.status(400).json({
             message: "The expected date must be in the future and match format YYY-MM-DD."
         });
+
         return;
     }
 
     const cleanedData: PurchaseOrderBody = {
-        supplier: cleanedSupplier,
+        supplierId: supplierId,
         status: "open",
         expectedDate: cleanedDate
     }
@@ -267,6 +282,7 @@ export async function postOrder(
             response.status(500).json({
                 message: "The purchase order could not be created."
             });
+
             return;
         }
 
@@ -280,7 +296,7 @@ export async function postOrder(
     }
 }
 
-// Post a PO line to a PO
+// Post a purchase order line to a purchase order
 export async function postOrderLine(
     request: Request<
         { id: string },
@@ -304,6 +320,7 @@ export async function postOrderLine(
         response.status(400).json({
             message: "Numerical values must be positive integers."
         });
+
         return;
     }
 
@@ -321,6 +338,7 @@ export async function postOrderLine(
             response.status(404).json({
                 message: "Purchase order or SKU not found."
             });
+
             return;
         }
 
@@ -335,7 +353,7 @@ export async function postOrderLine(
     }
 }
 
-// Put a PO line receipt
+// Put a purchase order line receipt
 export async function putLineReceipt(
     request: Request<
         { id: string },
@@ -350,11 +368,12 @@ export async function putLineReceipt(
     // Retrieve body values
     const { received, damaged } = request.body ?? {};
 
-    // Validate Id
+    // Validate Ids
     if (!isPositiveInteger(lineId)) {
         response.status(400).json({
             message: "Purchase order line Id must be a positive integer."
         });
+
         return;
     }
 
@@ -365,6 +384,7 @@ export async function putLineReceipt(
                 "must be non-negative integers, " +
                 "and damaged cannot exceed received."
         });
+
         return;
     }
 
@@ -384,13 +404,54 @@ export async function putLineReceipt(
             response.status(404).json({
                 message: "Purchase order line not found."
             });
+            
             return;
         }
 
         response.status(200).json(result);
 
     } catch (error) {
-        console.error("Error posting receipt: ", error);
+        console.error("Error updating receipt: ", error);
+
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
+    }
+}
+
+// Patch a purchase order status as "closed"
+export async function closePurchaseOrderStatus(
+    request: Request <{ id: string }>,
+    response: Response
+): Promise<void> {
+    // Convert route param from string to number
+    const orderId = Number(request.params.id);
+
+    // Validate Id
+    if (!isPositiveInteger(orderId)) {
+        response.status(400).json({
+            message: "Order Id must be a positive integer."
+        });
+
+        return
+    }
+
+    try {
+        const result = await closePurchaseOrder(orderId);
+
+        // Return error if result is undefiend
+        if (result === undefined) {
+            response.status(404).json({
+                message: "Purchase order line not found."
+            });
+
+            return;
+        }
+
+        response.status(200).json(result);
+
+    } catch (error) {
+        console.error("Error updating purchase order status: ", error);
 
         response.status(500).json({
             message: "An internal server error occurred."

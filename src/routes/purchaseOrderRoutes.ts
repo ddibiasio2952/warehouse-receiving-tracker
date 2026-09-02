@@ -10,10 +10,11 @@ import {
     getPurchaseOrdersForReview,
     postOrder,
     postOrderLine,
-    putLineReceipt
+    putLineReceipt,
+    closePurchaseOrderStatus
 } from "../controllers/purchaseOrderController";
 
-// Create a router for PO endpoints
+// Create a router for purchase order endpoints
 const purchaseOrderRouter: Router = Router();
 
 // GET /api/purchase-orders
@@ -24,7 +25,7 @@ purchaseOrderRouter.get(
 );
 
 // GET /api/purchase-orders/:id/summary
-// Get PO Summary by Id 
+// Get purchase order Summary by Id 
 purchaseOrderRouter.get(
     "/:id/summary",
     getPurchaseOrderSummary
@@ -37,10 +38,10 @@ purchaseOrderRouter.get(
     getPurchaseOrdersForReview
 );
 
-// GET /api/purchase-orders/:id/line-reports-by-po
-// Get line reports by PO Id 
+// GET /api/purchase-orders/:id/lines
+// Get line reports by purchase order Id 
 purchaseOrderRouter.get(
-    "/:id/line-reports-by-po",
+    "/:id/lines",
     getLineReportsByPurchaseOrderId
 );
 
@@ -59,18 +60,25 @@ purchaseOrderRouter.post(
 )
 
 // POST /api/purchase-orders/:id
-// Post a new PO line
+// Post a new purchase order line
 purchaseOrderRouter.post(
     "/lines/:id",
     postOrderLine
 )
 
 // PUT /api/purchase-orders/lines/:id/receipt
-// Put a new receipt for a PO line
+// Put a new receipt for a purchase order line
 purchaseOrderRouter.put(
     "/lines/:id/receipt",
     putLineReceipt
 );
+
+// PATCH /api/purchase-orders/:id/close
+// Change the status of a purchase order to "closed"
+purchaseOrderRouter.patch(
+    "/:id/close",
+    closePurchaseOrderStatus
+)
 
 // Export
 export default purchaseOrderRouter;
