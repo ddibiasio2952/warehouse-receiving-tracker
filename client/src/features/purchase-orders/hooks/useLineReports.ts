@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback,
+    useEffect, 
+    useState 
+} from "react";
 
 import type {
     LineResult,
@@ -26,12 +29,13 @@ export function useLineReports(
     const [lineErrorMessage, setLineErrorMessage] =
         useState<string | null>(null);
 
-    // Store the selected purchase-order line Id
+    // Store the selected purchase-order line ID
     const [selectedLineId, setSelectedLineId] =
         useState<number | null>(null);
 
-    // Retrieve line reports when an order is selected
-    useEffect(() => {
+    // Retrieve the selected order's line reports
+    const refreshLineReports = 
+    useCallback(async (): Promise<void> => {
         if (selectedPurchaseOrderId === null) {
             setLineReports([]);
             setSelectedLineId(null);
@@ -39,22 +43,19 @@ export function useLineReports(
             return;
         }
 
-        const purchaseOrderId = selectedPurchaseOrderId;
-
-        async function loadLineReports(): Promise<void> {
             try {
                 setAreLinesLoading(true);
-                setLineReports([]);
                 setLineErrorMessage(null);
                 setSelectedLineId(null);
 
-                const data =
-                    await getLineReports(purchaseOrderId);
+                const data = await getLineReports(
+                    selectedPurchaseOrderId
+                );
 
                 setLineReports(data);
             } catch (error) {
                 console.error(
-                    "Error retrieving line reports:",
+                    "Error retrieving line reports: ",
                     error
                 );
 
@@ -66,10 +67,12 @@ export function useLineReports(
             } finally {
                 setAreLinesLoading(false);
             }
-        }
+        }, [selectedPurchaseOrderId]);
 
-        void loadLineReports();
-    }, [selectedPurchaseOrderId]);
+    // Retrieve reports when the selected order changes
+    useEffect(() => {
+        void refreshLineReports();
+    }, [refreshLineReports]);
 
     // Record a receipt and update the matching report
     async function handleReceiptSubmit(
@@ -94,7 +97,7 @@ export function useLineReports(
             setSelectedLineId(null);
         } catch (error) {
             console.error(
-                "Error recording receipt:",
+                "Error recording receipt: ",
                 error
             );
 
@@ -110,6 +113,7 @@ export function useLineReports(
         lineErrorMessage,
         selectedLineId,
         setSelectedLineId,
+        refreshLineReports,
         handleReceiptSubmit
     };
 }

@@ -7,11 +7,13 @@ type CloseOrderFormProps = {
     onSubmit: (
         orderId: number
     ) => Promise<void>;
+    onCancel: () => void;
 };
 
 function CloseOrderForm({
     orderId,
-    onSubmit
+    onSubmit,
+    onCancel
 }: CloseOrderFormProps) {
     
     async function handleClose(
@@ -31,6 +33,12 @@ function CloseOrderForm({
             </label> */}
             <button type="submit">
                 Close Order
+            </button>
+            <button 
+                type="button"
+                onClick={onCancel}
+            >
+                Cancel
             </button>
         </form>
     );

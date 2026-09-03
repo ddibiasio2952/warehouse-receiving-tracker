@@ -1,6 +1,9 @@
 import type {
     PurchaseOrderDetails,
     LineResult,
+    PurchaseOrderLine,
+    PurchaseOrderLineDetails,
+    PurchaseOrderLineRequestBody,
     ReceiptRequestBody
 } from "../../../../../src/types/types";
 
@@ -35,6 +38,52 @@ export async function getLineReports(
 
     // Convert response into line report objects
     const data: LineResult[] = await response.json();
+
+    return data;
+}
+
+// Retrieve a purchase order line by ID
+export async function getPurchaseOrderLine(
+    lineId: number
+): Promise<PurchaseOrderLineDetails> {
+    const response = await fetch(
+        `/api/purchase-orders/lines/${lineId}`
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to retrieve the purchase order line."
+        );
+    }
+
+    const data: PurchaseOrderLineDetails = await response.json();
+
+    return data;
+}
+
+// Add a purchase order line to a purchase order
+export async function addPurchaseOrderLine(
+    orderId: number,
+    lineBody: PurchaseOrderLineRequestBody
+): Promise<PurchaseOrderLine> {
+    const response = await fetch(
+        `/api/purchase-orders/lines/${orderId}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(lineBody)
+        }
+    );
+
+    // Throw an error if the request is unsuccessful
+    if (!response.ok) {
+        throw new Error("Failed to add new purchase order line.");
+    }
+
+    // Convert the response into a purchase order line result object
+    const data: PurchaseOrderLine = await response.json();
 
     return data;
 }

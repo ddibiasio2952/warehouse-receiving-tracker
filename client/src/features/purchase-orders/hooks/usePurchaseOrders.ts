@@ -45,6 +45,24 @@ export function usePurchaseOrders() {
     const [closeErrorMessage, setCloseErrorMessage] =
         useState<string | null>(null);
 
+    // Select an order for closure and clear the current line selection
+    function handleRequestCloseOrder(
+        purchaseOrderId: number
+    ): void {
+        const selectedOrder = purchaseOrders.find(
+            (purchaseOrder) =>
+                purchaseOrder.id === purchaseOrderId
+        );
+
+        setSelectedPurchaseOrderId(purchaseOrderId);
+
+        setSelectedSupplierName(
+            selectedOrder?.supplierName ?? null
+        );
+
+        setSelectedCloseOrderId(purchaseOrderId);
+    }
+
     // Retrieve purchase orders when the hook first runs
     useEffect(() => {
         async function loadPurchaseOrders(): Promise<void> {
@@ -124,6 +142,7 @@ export function usePurchaseOrders() {
         closeErrorMessage,
         setSelectedCloseOrderId,
         handleSelectOrder,
+        handleRequestCloseOrder,
         handleCloseOrder
     };
 }

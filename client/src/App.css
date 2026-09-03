@@ -18,6 +18,32 @@ ul {
   padding: 0;
 }
 
+button { 
+  margin: 0 0.25rem;
+}
+
+/* App Navigation */
+.app-navigation {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background-color: #1f2937;
+}
+
+.navigation-link {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.navigation-link:hover {
+    text-decoration: underline;
+}
+
+.navigation-link.active {
+    font-weight: bold;
+    color: #93c5fd;
+}
+
 /* Purchase Orders Table */
 .purchase-orders-table {
     margin: 0 auto;

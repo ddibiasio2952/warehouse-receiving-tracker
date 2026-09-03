@@ -82,6 +82,7 @@ export async function getPurchaseOrderLinesByOrderId(
             INNER JOIN Suppliers
                 ON Suppliers.Id = Skus.SupplierId
             WHERE PurchaseOrderLines.PurchaseOrderId = @purchaseOrderId
+            ORDER BY PurchaseOrderLines.Id ASC;
         `);
 
     // Return with all numerical values set as number types

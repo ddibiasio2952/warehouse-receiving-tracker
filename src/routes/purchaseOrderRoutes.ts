@@ -59,7 +59,7 @@ purchaseOrderRouter.post(
     postOrder
 )
 
-// POST /api/purchase-orders/:id
+// POST /api/purchase-orders/lines/:id
 // Post a new purchase order line
 purchaseOrderRouter.post(
     "/lines/:id",
