@@ -52,7 +52,7 @@ export async function getAllSkus(
     }
 }
 
-// Get a SKU by Id
+// Get a SKU by ID
 export async function getSkuById(
     request: Request<{ id: string }>,
     response: Response
@@ -60,10 +60,10 @@ export async function getSkuById(
     // Convert route param from string to number
     const skuId: number = Number(request.params.id);
 
-    // Validate Id
+    // Validate ID
     if (!isPositiveInteger(skuId)) {
         response.status(400).json({
-            message: "Sku Id must be a positive integer."
+            message: "Sku ID must be a positive integer."
         });
 
         return;
@@ -103,10 +103,10 @@ export async function postSku(
     // Retrieve body values
     const { skuNumber, description, supplierId } = request.body ?? {};
 
-    // Validate Supplier Id
+    // Validate Supplier ID
     if (!isPositiveInteger(supplierId)) {
         response.status(400).json({
-            message: "Supplier Id must be a positive integer."
+            message: "Supplier ID must be a positive integer."
         });
 
         return;
@@ -201,19 +201,19 @@ export async function putSku(
     // Retrieve body values
     const { skuNumber, description, supplierId } = request.body ?? {};
 
-    // Validate Ids
+    // Validate IDs
     if (!isPositiveInteger(skuId)) {
         response.status(400).json({
-            message: "SKU Id must be a positive integer."
+            message: "SKU ID must be a positive integer."
         });
 
         return;
     }
 
-    // Validate Supplier Id
+    // Validate Supplier ID
     if (!isPositiveInteger(supplierId)) {
         response.status(400).json({
-            message: "Supplier Id must be a positive integer."
+            message: "Supplier ID must be a positive integer."
         });
 
         return;

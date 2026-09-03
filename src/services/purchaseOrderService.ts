@@ -50,7 +50,7 @@ export function getDiscrepancyStatus(difference: number): LineStatus {
             "match";
 };
 
-// Get purchase order line discrepancy reports by purchase order Id
+// Get purchase order line discrepancy reports by purchase order ID
 export async function getLineReports(
     purchaseOrderId: number
 ): Promise<LineResult[]> {
@@ -148,7 +148,7 @@ export async function processReceipt(
         data
     );
 
-    // Validate lineId
+    // Validate purchase order line ID
     if (updatedLine === undefined) {
         return undefined;
     }

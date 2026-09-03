@@ -6,11 +6,13 @@ import type {
 type LineReportTableProps = {
     lineReports: LineResult[];
     onSelectLine: (lineId: number) => void;
+    canRecordReceipt: boolean;
 };
 
 function LineReportTable({
     lineReports,
-    onSelectLine
+    onSelectLine,
+    canRecordReceipt
 }: LineReportTableProps) {
     // Display a message when the order has no lines
     if (lineReports.length === 0) {
@@ -72,16 +74,20 @@ function LineReportTable({
                             </td>
 
                             <td>
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        onSelectLine(
-                                            lineReport.purchaseOrderLineId
-                                        )
-                                    }
-                                >
-                                    Record Receipt
-                                </button>
+                                {canRecordReceipt ? (
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            onSelectLine(
+                                                lineReport.purchaseOrderLineId
+                                            )
+                                        }
+                                    >
+                                        Record Receipt
+                                    </button>
+                                ) : (
+                                    <span>Order Closed</span>
+                                )}
                             </td>
                         </tr>
                     )

@@ -1,148 +1,83 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
 
 import type {
     PurchaseOrderDetails
 } from "../../../../../src/types/types";
 
-import {
-    closePurchaseOrder,
-    getPurchaseOrders
-} from "../services/purchaseOrderApi";
+import { getPurchaseOrders } from
+    "../services/purchaseOrderApi";
 
 
 export function usePurchaseOrders() {
     // Store purchase orders returned by the API
-    const [purchaseOrders, setPurchaseOrders] =
-        useState<PurchaseOrderDetails[]>([]);
-
-    // Store an error from the initial purchase-order request
-    const [errorMessage, setErrorMessage] =
-        useState<string | null>(null);
-
-    // Track whether purchase orders are loading
-    const [isLoading, setIsLoading] =
-        useState<boolean>(true);
-
-    // Store the selected purchase order
     const [
-        selectedPurchaseOrderId,
-        setSelectedPurchaseOrderId
-    ] = useState<number | null>(null);
+        purchaseOrders,
+        setPurchaseOrders
+    ] = useState<PurchaseOrderDetails[]>([]);
 
-    // Store the selected purchase order's supplier
+    // Store an error from retrieving purchase orders
     const [
-        selectedSupplierName,
-        setSelectedSupplierName
+        errorMessage,
+        setErrorMessage
     ] = useState<string | null>(null);
 
-    // Store the purchase order awaiting closure confirmation
+    // Track whether purchase orders are loading
     const [
-        selectedCloseOrderId,
-        setSelectedCloseOrderId
-    ] = useState<number | null>(null);
-
-    // Store an error from closing a purchase order
-    const [closeErrorMessage, setCloseErrorMessage] =
-        useState<string | null>(null);
-
-    // Select an order for closure and clear the current line selection
-    function handleRequestCloseOrder(
-        purchaseOrderId: number
-    ): void {
-        const selectedOrder = purchaseOrders.find(
-            (purchaseOrder) =>
-                purchaseOrder.id === purchaseOrderId
-        );
-
-        setSelectedPurchaseOrderId(purchaseOrderId);
-
-        setSelectedSupplierName(
-            selectedOrder?.supplierName ?? null
-        );
-
-        setSelectedCloseOrderId(purchaseOrderId);
-    }
+        isLoading,
+        setIsLoading
+    ] = useState<boolean>(true);
 
     // Retrieve purchase orders when the hook first runs
     useEffect(() => {
+        let requestWasCancelled = false;
+
         async function loadPurchaseOrders(): Promise<void> {
             try {
                 setIsLoading(true);
                 setErrorMessage(null);
 
-                const data = await getPurchaseOrders();
+                const data =
+                    await getPurchaseOrders();
 
-                setPurchaseOrders(data);
+                if (!requestWasCancelled) {
+                    setPurchaseOrders(data);
+                }
             } catch (error) {
+                if (requestWasCancelled) {
+                    return;
+                }
+
                 console.error(
-                    "Error retrieving purchase orders:",
+                    "Error retrieving purchase orders: ",
                     error
                 );
+
+                setPurchaseOrders([]);
 
                 setErrorMessage(
                     "Unable to load purchase orders."
                 );
             } finally {
-                setIsLoading(false);
+                if (!requestWasCancelled) {
+                    setIsLoading(false);
+                }
             }
         }
 
         void loadPurchaseOrders();
+
+        // Ignore results if the component unmounts
+        return () => {
+            requestWasCancelled = true;
+        };
     }, []);
-
-    // Store the selected order's Id and supplier
-    function handleSelectOrder(
-        purchaseOrderId: number,
-        supplierName: string
-    ): void {
-        setSelectedPurchaseOrderId(purchaseOrderId);
-        setSelectedSupplierName(supplierName);
-    }
-
-    // Close a purchase order after confirmation
-    async function handleCloseOrder(
-        purchaseOrderId: number
-    ): Promise<void> {
-        try {
-            setCloseErrorMessage(null);
-
-            const closedOrder =
-                await closePurchaseOrder(purchaseOrderId);
-
-            // Replace the matching order with the updated order
-            setPurchaseOrders((currentPurchaseOrders) =>
-                currentPurchaseOrders.map((purchaseOrder) =>
-                    purchaseOrder.id === purchaseOrderId
-                        ? closedOrder
-                        : purchaseOrder
-                )
-            );
-
-            // Clear the selection and hide the close-order form
-            setSelectedCloseOrderId(null);
-        } catch (error) {
-            console.error(
-                "Error closing purchase order:",
-                error
-            );
-
-            setCloseErrorMessage(
-                "Unable to close the purchase order."
-            );
-        }
-    }
 
     return {
         purchaseOrders,
         errorMessage,
-        isLoading,
-        selectedPurchaseOrderId,
-        selectedSupplierName,
-        selectedCloseOrderId,
-        closeErrorMessage,
-        setSelectedCloseOrderId,
-        handleSelectOrder,
-        handleRequestCloseOrder,
-        handleCloseOrder
+        isLoading
     };
 }

@@ -190,6 +190,9 @@ function PurchaseOrderDetailsPage() {
                                     onSelectLine={
                                         handleSelectLine
                                     }
+                                    canRecordReceipt={
+                                        purchaseOrder.status !== "closed"
+                                    }
                                 />
                             )}
                     </>

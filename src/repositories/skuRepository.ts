@@ -35,7 +35,7 @@ export async function getSkus():
     }));
 }
 
-// Retrieve a SKU by Id
+// Retrieve a SKU by ID
 export async function getSku(skuId: number):
     Promise<Sku | undefined> {
     const pool = await getPool();

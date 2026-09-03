@@ -145,10 +145,10 @@ export async function getLineReportsByPurchaseOrderId(
     // Convert route param from string to number
     const orderId: number = Number(request.params.id);
 
-    // Validate Id
+    // Validate ID
     if (!isPositiveInteger(orderId)) {
         response.status(400).json({
-            message: "Purchase order Id must be a positive integer."
+            message: "Purchase order ID must be a positive integer."
         });
         return;
     }
@@ -176,7 +176,7 @@ export async function getLineReportsByPurchaseOrderId(
     }
 }
 
-// Get purchase order line by line Id
+// Get purchase order line by line ID
 export async function getLineByLineId(
     request: Request<{ id: string }>,
     response: Response
@@ -184,10 +184,10 @@ export async function getLineByLineId(
     // Convert route param from string to number
     const lineId: number = Number(request.params.id);
 
-    // Validate Id
+    // Validate ID
     if (!isPositiveInteger(lineId)) {
         response.status(400).json({
-            message: "Line Id must be a positive integer."
+            message: "Line ID must be a positive integer."
         });
 
         return;
@@ -227,10 +227,10 @@ export async function postOrder(
     // Retrieve body values
     const { supplierId, expectedDate } = request.body ?? {};
 
-    // Validate Supplier Id
+    // Validate Supplier ID
         if (!isPositiveInteger(supplierId)) {
             response.status(400).json({
-                message: "Supplier Id must be a positive integer."
+                message: "Supplier ID must be a positive integer."
             });
     
             return;
@@ -368,10 +368,10 @@ export async function putLineReceipt(
     // Retrieve body values
     const { received, damaged } = request.body ?? {};
 
-    // Validate Ids
+    // Validate IDs
     if (!isPositiveInteger(lineId)) {
         response.status(400).json({
-            message: "Purchase order line Id must be a positive integer."
+            message: "Purchase order line ID must be a positive integer."
         });
 
         return;
@@ -427,10 +427,10 @@ export async function closePurchaseOrderStatus(
     // Convert route param from string to number
     const orderId = Number(request.params.id);
 
-    // Validate Id
+    // Validate ID
     if (!isPositiveInteger(orderId)) {
         response.status(400).json({
-            message: "Order Id must be a positive integer."
+            message: "Order ID must be a positive integer."
         });
 
         return

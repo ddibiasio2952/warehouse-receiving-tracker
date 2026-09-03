@@ -20,7 +20,7 @@ skuRouter.get(
 );
 
 // GET /api/skus/:id
-// Get a SKU by Id
+// Get a SKU by ID
 skuRouter.get(
     "/:id",
     getSkuById

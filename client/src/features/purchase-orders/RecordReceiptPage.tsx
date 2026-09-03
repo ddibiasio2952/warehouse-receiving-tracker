@@ -17,6 +17,9 @@ import type {
 import ReceiptForm from
     "./components/ReceiptForm";
 
+import { usePurchaseOrders } from
+    "./hooks/usePurchaseOrders";
+
 import {
     getPurchaseOrderLine,
     recordReceipt
@@ -37,6 +40,21 @@ function RecordReceiptPage() {
     const orderId = Number(purchaseOrderId);
     const purchaseOrderLineId = Number(lineId);
 
+    const {
+        purchaseOrders,
+        errorMessage: purchaseOrderErrorMessage,
+        isLoading: arePurchaseOrdersLoading
+    } = usePurchaseOrders();
+
+    // Find the purchase order from the URL
+    const purchaseOrder = purchaseOrders.find(
+        (order) => order.id === orderId
+    );
+
+    // Determine whether receipt entry is prohibited
+    const isOrderClosed =
+        purchaseOrder?.status === "closed";
+
     // Store the selected purchase order line
     const [
         lineDetails,
@@ -51,13 +69,13 @@ function RecordReceiptPage() {
         setIsLineLoading
     ] = useState<boolean>(true);
 
-    // Store a line-loading error
+    // Store an error from loading the line
     const [
         lineErrorMessage,
         setLineErrorMessage
     ] = useState<string | null>(null);
 
-    // Store a receipt-submission error
+    // Store an error from recording the receipt
     const [
         receiptErrorMessage,
         setReceiptErrorMessage
@@ -75,13 +93,14 @@ function RecordReceiptPage() {
         Number.isInteger(purchaseOrderLineId) &&
         purchaseOrderLineId > 0;
 
-    // Load the selected line
+    // Retrieve the selected purchase order line
     useEffect(() => {
         if (!hasValidParameters) {
             setIsLineLoading(false);
             return;
         }
 
+        const validLineId = purchaseOrderLineId;
         let requestWasCancelled = false;
 
         async function loadLineDetails(): Promise<void> {
@@ -91,18 +110,19 @@ function RecordReceiptPage() {
 
                 const data =
                     await getPurchaseOrderLine(
-                        purchaseOrderLineId
+                        validLineId
                     );
 
                 if (requestWasCancelled) {
                     return;
                 }
 
-                // Verify that the line belongs to the URL's order
+                // Verify that the line belongs to this order
                 if (data.purchaseOrderId !== orderId) {
+                    setLineDetails(null);
+
                     setLineErrorMessage(
-                        "This line does not belong to " +
-                        "the selected purchase order."
+                        "This line does not belong to the selected purchase order."
                     );
 
                     return;
@@ -119,6 +139,8 @@ function RecordReceiptPage() {
                     error
                 );
 
+                setLineDetails(null);
+
                 setLineErrorMessage(
                     error instanceof Error
                         ? error.message
@@ -133,6 +155,7 @@ function RecordReceiptPage() {
 
         void loadLineDetails();
 
+        // Ignore results if the page unmounts Rect
         return () => {
             requestWasCancelled = true;
         };
@@ -142,10 +165,20 @@ function RecordReceiptPage() {
         purchaseOrderLineId
     ]);
 
+    // Record the receipt
     async function handleReceiptSubmit(
         submittedLineId: number,
         receiptBody: ReceiptRequestBody
     ): Promise<void> {
+        // Guard against submission for a closed order
+        if (isOrderClosed) {
+            setReceiptErrorMessage(
+                "Receipts cannot be recorded for a closed purchase order."
+            );
+
+            return;
+        }
+
         try {
             setIsRecordingReceipt(true);
             setReceiptErrorMessage(null);
@@ -161,7 +194,7 @@ function RecordReceiptPage() {
             );
         } catch (error) {
             console.error(
-                "Error recording receipt: ",
+                "Error recording receipt:",
                 error
             );
 
@@ -175,6 +208,7 @@ function RecordReceiptPage() {
         }
     }
 
+    // Reject invalid URL parameters
     if (!hasValidParameters) {
         return (
             <main className="app-container">
@@ -196,48 +230,86 @@ function RecordReceiptPage() {
             <Link
                 to={`/purchase-orders/${orderId}`}
             >
-                Back to Purchase Order
+                ← Back to Purchase Order
             </Link>
 
             <h1>Record Receipt</h1>
 
-            {isLineLoading && (
-                <p>Loading SKU information...</p>
+            {/* Purchase order loading condition */}
+            {arePurchaseOrdersLoading && (
+                <p>Loading purchase order...</p>
             )}
 
+            {/* Purchase order error condition */}
+            {purchaseOrderErrorMessage && (
+                <p className="error-message">
+                    {purchaseOrderErrorMessage}
+                </p>
+            )}
+
+            {/* Purchase order not-found condition */}
+            {!arePurchaseOrdersLoading &&
+                !purchaseOrderErrorMessage &&
+                !purchaseOrder && (
+                    <p className="error-message">
+                        Purchase order not found.
+                    </p>
+                )}
+
+            {/* Closed order condition */}
+            {!arePurchaseOrdersLoading &&
+                purchaseOrder &&
+                isOrderClosed && (
+                    <p className="error-message">
+                        Receipts cannot be recorded because
+                        this purchase order is closed.
+                    </p>
+                )}
+
+            {/* Line loading condition */}
+            {isLineLoading && (
+                <p>Loading purchase order line...</p>
+            )}
+
+            {/* Line error condition */}
             {lineErrorMessage && (
                 <p className="error-message">
                     {lineErrorMessage}
                 </p>
             )}
 
+            {/* Selected SKU */}
             {lineDetails && (
-                <>
-                    <p>
-                        SKU Number:{" "}
-                        <span className="sku-number">
-                            {lineDetails.skuNumber}
-                        </span>
-                    </p>
+                <p>
+                    SKU Number: {lineDetails.skuNumber}
+                </p>
+            )}
 
-                    {receiptErrorMessage && (
-                        <p className="error-message">
-                            {receiptErrorMessage}
-                        </p>
-                    )}
+            {/* Receipt submission error */}
+            {receiptErrorMessage && (
+                <p className="error-message">
+                    {receiptErrorMessage}
+                </p>
+            )}
 
-                    {isRecordingReceipt && (
-                        <p>Recording receipt...</p>
-                    )}
+            {/* Receipt submission loading condition */}
+            {isRecordingReceipt && (
+                <p>Recording receipt...</p>
+            )}
 
+            {/* Receipt form */}
+            {!arePurchaseOrdersLoading &&
+                !purchaseOrderErrorMessage &&
+                purchaseOrder &&
+                !isOrderClosed &&
+                !isLineLoading &&
+                !lineErrorMessage &&
+                lineDetails && (
                     <ReceiptForm
                         lineId={purchaseOrderLineId}
-                        onSubmit={
-                            handleReceiptSubmit
-                        }
+                        onSubmit={handleReceiptSubmit}
                     />
-                </>
-            )}
+                )}
         </main>
     );
 }
