@@ -5,6 +5,7 @@ import { Router } from "express";
 import {
     getAllSkus,
     getSkuById,
+    getSkusBySupplier,
     postSku,
     putSku
 } from "../controllers/skuController";
@@ -24,6 +25,13 @@ skuRouter.get(
 skuRouter.get(
     "/:id",
     getSkuById
+);
+
+// GET /api/skus/supplier/:id
+// Get a SKU by supplier ID
+skuRouter.get(
+    "/supplier/:id",
+    getSkusBySupplier
 );
 
 // POST /api/skus/new

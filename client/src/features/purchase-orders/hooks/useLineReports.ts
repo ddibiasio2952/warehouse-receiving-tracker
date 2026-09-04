@@ -7,8 +7,9 @@ import type {
     LineResult
 } from "../../../../../src/types/types";
 
-import { getLineReports } from
-    "../services/purchaseOrderApi";
+import { 
+    getLineReports 
+} from "../services/purchaseOrderApi";
 
 
 export function useLineReports(
@@ -35,10 +36,6 @@ export function useLineReports(
     // Retrieve lines when the purchase order ID changes
     useEffect(() => {
         if (purchaseOrderId === null) {
-            setLineReports([]);
-            setLineErrorMessage(null);
-            setAreLinesLoading(false);
-
             return;
         }
 
@@ -89,8 +86,20 @@ export function useLineReports(
     }, [purchaseOrderId]);
 
     return {
-        lineReports,
-        areLinesLoading,
-        lineErrorMessage
+        // Return empty values if no valid order selected
+        lineReports:
+            purchaseOrderId === null
+                ? []
+                : lineReports,
+
+        areLinesLoading:
+            purchaseOrderId === null
+                ? false
+                : areLinesLoading,
+
+        lineErrorMessage:
+            purchaseOrderId === null
+                ? null
+                : lineErrorMessage
     };
 }

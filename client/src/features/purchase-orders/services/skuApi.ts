@@ -19,6 +19,23 @@ export async function getSkus():
     return data;
 }
 
+// Retrieve SKUs by supplier ID
+export async function getSkusBySupplierId(
+    supplierId: number
+): Promise<Sku[]> {
+    const response = await fetch(`/api/skus/supplier/${supplierId}`);
+
+    // Throw an error if request is unsuccessful
+    if (!response.ok) {
+        throw new Error("Failed to retrieve SKUs by supplier ID.");
+    }
+
+    // Convert response into SKU objects
+    const data: Sku[] = await response.json();
+
+    return data;
+}
+
 // Add a SKU
 export async function addSku(
     skuBody: SkuRequestBody
@@ -28,7 +45,7 @@ export async function addSku(
         {
             method: "POST",
             headers: {
-                "COntent-Type": "application/json"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(skuBody)
         }

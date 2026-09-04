@@ -29,6 +29,7 @@ import {
 function RecordReceiptPage() {
     const navigate = useNavigate();
 
+    // Get the purchase order ID and line ID from the URL
     const {
         purchaseOrderId,
         lineId
@@ -46,7 +47,7 @@ function RecordReceiptPage() {
         isLoading: arePurchaseOrdersLoading
     } = usePurchaseOrders();
 
-    // Find the purchase order from the URL
+    // Find the purchase order data from the URL ID
     const purchaseOrder = purchaseOrders.find(
         (order) => order.id === orderId
     );
@@ -95,10 +96,9 @@ function RecordReceiptPage() {
 
     // Retrieve the selected purchase order line
     useEffect(() => {
-        if (!hasValidParameters) {
-            setIsLineLoading(false);
-            return;
-        }
+    if (!hasValidParameters) {
+        return;
+    }
 
         const validLineId = purchaseOrderLineId;
         let requestWasCancelled = false;
@@ -155,7 +155,7 @@ function RecordReceiptPage() {
 
         void loadLineDetails();
 
-        // Ignore results if the page unmounts Rect
+        // Ignore results if the page unmounts
         return () => {
             requestWasCancelled = true;
         };
@@ -228,9 +228,10 @@ function RecordReceiptPage() {
     return (
         <main className="app-container">
             <Link
+                className="back-link"
                 to={`/purchase-orders/${orderId}`}
             >
-                ← Back to Purchase Order
+                Back to Purchase Order
             </Link>
 
             <h1>Record Receipt</h1>
@@ -247,7 +248,7 @@ function RecordReceiptPage() {
                 </p>
             )}
 
-            {/* Purchase order not-found condition */}
+            {/* Purchase order not found condition */}
             {!arePurchaseOrdersLoading &&
                 !purchaseOrderErrorMessage &&
                 !purchaseOrder && (

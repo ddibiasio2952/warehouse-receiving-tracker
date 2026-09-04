@@ -3,6 +3,7 @@ import { useState } from "react";
 // Import types
 import type { SubmitEvent } from "react";
 import type {
+    Sku,
     PurchaseOrderLineRequestBody
 } from "../../../../../src/types/types";
 
@@ -10,6 +11,7 @@ import type {
 
 type OrderLineFormProps = {
     orderId: number,
+    skusBySupplier: Sku[];
     onSubmit: (
         orderId: number,
         lineBody: PurchaseOrderLineRequestBody
@@ -19,6 +21,7 @@ type OrderLineFormProps = {
 
 function OrderLineForm({
     orderId,
+    skusBySupplier,
     onSubmit
 }: OrderLineFormProps) {
     // Store the SKU ID entered by the user
@@ -43,19 +46,29 @@ function OrderLineForm({
             onSubmit={handleLineSubmit}>
             <h3>Submit New Line for Order {orderId}</h3>
 
-            <label htmlFor="sku-id">
-                SKU ID
+            <label htmlFor="sku-name">
+                SKU Name
             </label>
-
-            <input
-                id="sku-id"
-                type="number"
-                min="0"
+            <select
+                id="skuId"
                 value={skuId}
                 onChange={(event) =>
                     setSkuId(Number(event.target.value))
                 }
-            />
+            >
+                <option value={0}>
+                    Select a SKU
+                </option>
+
+                {skusBySupplier.map((sku) => (
+                    <option
+                        key={sku.id}
+                        value={sku.id}
+                    >
+                        {sku.skuNumber} — {sku.description}
+                    </option>
+                ))}
+            </select>
 
             <label htmlFor="expected-quantity">
                 Expected Quantity
@@ -70,6 +83,10 @@ function OrderLineForm({
                     setExpectedQuantity(Number(event.target.value))
                 }
             />
+
+            <button type="submit">
+                Add Order Line
+            </button>
         </form>
 
     )

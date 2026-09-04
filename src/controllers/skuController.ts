@@ -22,6 +22,7 @@ import {
 import {
     getSkus,
     getSku,
+    getSkusBySupplierId,
     addSku,
     updateSku
 } from "../repositories/skuRepository";
@@ -84,6 +85,38 @@ export async function getSkuById(
         response.status(200).json(result);
     } catch (error) {
         console.error("Error retrieving sku: ", error);
+
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
+    }
+}
+
+// Get SKUs by supplier ID
+
+export async function getSkusBySupplier(
+    request: Request<{ id: string }>,
+    response: Response
+): Promise<void> {
+    // Convert route param from string to number
+    const supplierId = Number(request.params.id);
+
+    // Validate ID
+    if (!isPositiveInteger(supplierId)) {
+        response.status(400).json({
+            message: "Supplier ID must be a positive integer."
+        });
+
+        return;
+    }
+
+    try {
+        // Get all SKUs by supplier ID from repository
+        const result = await getSkusBySupplierId(supplierId);
+
+        response.status(200).json(result);
+    } catch (error) {
+        console.error("Error retrieving SKUs by supplier ID: ", error);
 
         response.status(500).json({
             message: "An internal server error occurred."

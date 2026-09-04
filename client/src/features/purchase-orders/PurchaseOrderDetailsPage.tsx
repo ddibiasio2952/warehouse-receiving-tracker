@@ -87,7 +87,9 @@ function PurchaseOrderDetailsPage() {
 
     return (
         <main className="app-container">
-            <Link to="/purchase-orders">
+            <Link 
+                className="back-link"
+                to="/purchase-orders">
                 Back to Purchase Orders
             </Link>
 

@@ -13,6 +13,12 @@ import type {
 import OrderLineForm from
     "./components/OrderLineForm";
 
+import { usePurchaseOrders } from
+    "./hooks/usePurchaseOrders";
+
+import { useSkusBySupplier } from
+    "./hooks/useSkusBySupplier";
+
 import { addPurchaseOrderLine } from
     "./services/purchaseOrderApi";
 
@@ -20,22 +26,47 @@ import { addPurchaseOrderLine } from
 function AddPurchaseOrderLinePage() {
     const navigate = useNavigate();
 
+    // Get the purchase order ID from the URL
     const { purchaseOrderId } = useParams<{
         purchaseOrderId: string;
     }>();
 
     const orderId = Number(purchaseOrderId);
 
+    // Load purchase orders
+    const {
+        purchaseOrders,
+        errorMessage: purchaseOrderErrorMessage,
+        isLoading: arePurchaseOrdersLoading
+    } = usePurchaseOrders();
+
+    // Find the purchase order from the URL ID
+    const purchaseOrder = purchaseOrders.find(
+        (order) => order.id === orderId
+    );
+
+    // Load SKUs belonging to the order's supplier
+    const {
+        skusBySupplier,
+        skusBySupplierError,
+        skusBySupplierLoading
+    } = useSkusBySupplier(
+        purchaseOrder?.supplierId ?? null
+    );
+
+    // Store an error from adding the line
     const [
         addLineErrorMessage,
         setAddLineErrorMessage
     ] = useState<string | null>(null);
 
+    // Track whether the line is being added
     const [
         isAddingLine,
         setIsAddingLine
     ] = useState<boolean>(false);
 
+    // Validate the URL parameter
     const isValidOrderId =
         Number.isInteger(orderId) && orderId > 0;
 
@@ -72,6 +103,7 @@ function AddPurchaseOrderLinePage() {
         }
     }
 
+    // Display an invalid ID error
     if (!isValidOrderId) {
         return (
             <main className="app-container">
@@ -91,27 +123,84 @@ function AddPurchaseOrderLinePage() {
     return (
         <main className="app-container">
             <Link
+                className="back-link"
                 to={`/purchase-orders/${orderId}`}
             >
-                ← Back to Purchase Order
+                Back to Purchase Order
             </Link>
 
             <h1>Add Purchase Order Line</h1>
 
+            {/* Purchase order loading condition */}
+            {arePurchaseOrdersLoading && (
+                <p>Loading purchase order...</p>
+            )}
+
+            {/* Purchase order error condition */}
+            {purchaseOrderErrorMessage && (
+                <p className="error-message">
+                    {purchaseOrderErrorMessage}
+                </p>
+            )}
+
+            {/* Purchase order not found condition */}
+            {!arePurchaseOrdersLoading &&
+                !purchaseOrderErrorMessage &&
+                !purchaseOrder && (
+                    <p className="error-message">
+                        Purchase order not found.
+                    </p>
+                )}
+
+            {/* SKU loading condition */}
+            {purchaseOrder &&
+                skusBySupplierLoading && (
+                    <p>Loading SKUs...</p>
+                )}
+
+            {/* SKU error condition */}
+            {skusBySupplierError && (
+                <p className="error-message">
+                    {skusBySupplierError}
+                </p>
+            )}
+
+            {/* No available SKUs condition */}
+            {purchaseOrder &&
+                !skusBySupplierLoading &&
+                !skusBySupplierError &&
+                skusBySupplier.length === 0 && (
+                    <p className="error-message">
+                        No SKUs are available for this
+                        supplier.
+                    </p>
+                )}
+
+            {/* Add line error condition */}
             {addLineErrorMessage && (
                 <p className="error-message">
                     {addLineErrorMessage}
                 </p>
             )}
 
+            {/* Add line loading condition */}
             {isAddingLine && (
                 <p>Adding purchase order line...</p>
             )}
 
-            <OrderLineForm
-                orderId={orderId}
-                onSubmit={handleAddLine}
-            />
+            {/* Add purchase order line form */}
+            {!arePurchaseOrdersLoading &&
+                !purchaseOrderErrorMessage &&
+                purchaseOrder &&
+                !skusBySupplierLoading &&
+                !skusBySupplierError &&
+                skusBySupplier.length > 0 && (
+                    <OrderLineForm
+                        orderId={orderId}
+                        skusBySupplier={skusBySupplier}
+                        onSubmit={handleAddLine}
+                    />
+                )}
         </main>
     );
 }

@@ -30,6 +30,10 @@ button {
     background-color: #1f2937;
 }
 
+.back-link {
+  padding-top: 0.5rem;
+}
+
 .navigation-link {
     color: #ffffff;
     text-decoration: none;
@@ -83,6 +87,23 @@ button {
   background-color: #eeeeee;
 }
 
+/* Add Line Form */
+.order-line-form {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.order-line-form label {
+  margin-bottom: 0.2rem;
+}
+
+.order-line-form input {
+  margin-bottom: 0.5rem;
+}
+
 /* Receipt Form */
 .receipt-form {
   display: flex;
@@ -94,10 +115,8 @@ button {
 
 .receipt-form label {
   margin-bottom: 0.2rem;
-  /* border: 0.1rem solid black; */
 }
 
 .receipt-form input {
   margin-bottom: 0.5rem;
-  /* border: 0.1rem solid black; */
 }
