@@ -5,7 +5,7 @@ import sql = require("mssql/msnodesqlv8");
 import { getPool } from "../config/database";
 
 // Import interface types
-import { 
+import {
     Sku,
     SkuRequestBody
 } from "../types/types"
@@ -35,7 +35,7 @@ export async function getSkus():
     }));
 }
 
-// Retrieve a SKU by Id
+// Retrieve a SKU by ID
 export async function getSku(skuId: number):
     Promise<Sku | undefined> {
     const pool = await getPool();
@@ -67,6 +67,35 @@ export async function getSku(skuId: number):
     };
 }
 
+// Retrieve a SKU by Supplier
+export async function getSkusBySupplierId(supplierId: number):
+    Promise<Sku[]> {
+    const pool = await getPool();
+
+    const result = await pool
+        .request()
+        .input("supplierId", sql.Int, supplierId)
+        .query<Sku>(`
+            SELECT
+                Id AS id,
+                SkuNumber AS skuNumber,
+                Description AS description,
+                SupplierId AS supplierId
+            FROM Skus
+            WHERE SupplierId = @supplierId
+            ORDER BY SkuNumber;   
+        `);
+
+    const skus = result.recordset;
+
+    return skus.map(sku => ({
+        id: Number(sku.id),
+        skuNumber: sku.skuNumber,
+        description: sku.description,
+        supplierId: sku.supplierId
+    }));
+}
+
 // Add a SKU
 export async function addSku(
     data: SkuRequestBody
@@ -92,7 +121,7 @@ export async function addSku(
                 @supplierId
             );
         `);
-    
+
     const newSku = result.recordset[0];
 
     if (newSku === undefined) {

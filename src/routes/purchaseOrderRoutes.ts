@@ -25,7 +25,7 @@ purchaseOrderRouter.get(
 );
 
 // GET /api/purchase-orders/:id/summary
-// Get purchase order Summary by Id 
+// Get purchase order Summary by ID 
 purchaseOrderRouter.get(
     "/:id/summary",
     getPurchaseOrderSummary
@@ -39,14 +39,14 @@ purchaseOrderRouter.get(
 );
 
 // GET /api/purchase-orders/:id/lines
-// Get line reports by purchase order Id 
+// Get line reports by purchase order ID 
 purchaseOrderRouter.get(
     "/:id/lines",
     getLineReportsByPurchaseOrderId
 );
 
 // GET /api/purchase-orders/lines/:id
-// Get purchase order line by line Id 
+// Get purchase order line by line ID 
 purchaseOrderRouter.get(
     "/lines/:id",
     getLineByLineId
@@ -59,7 +59,7 @@ purchaseOrderRouter.post(
     postOrder
 )
 
-// POST /api/purchase-orders/:id
+// POST /api/purchase-orders/lines/:id
 // Post a new purchase order line
 purchaseOrderRouter.post(
     "/lines/:id",

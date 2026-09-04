@@ -3,6 +3,8 @@ export type PurchaseOrderStatus = "open" | "closed";
 export type LineStatus = "shortage" | "overage" | "match";
 
 /* INTERFACES */
+
+/* SKUS */
 export interface Sku {
     id: number;
     skuNumber: string;
@@ -24,6 +26,8 @@ export interface SkuRetrieveBody {
     supplierName: string;
 }
 
+
+/* PURCHASE ORDERS */
 export interface PurchaseOrder {
     id: number;
     status: PurchaseOrderStatus;
@@ -39,6 +43,25 @@ export interface PurchaseOrderDetails {
     supplierName: string;
 }
 
+export interface PurchaseOrderSummary {
+    purchaseOrderId: number;
+    totalLines: number;
+    discrepancyLines: number;
+    totalExpected: number;
+    totalReceived: number;
+    totalDamaged: number;
+    totalUsableReceived: number;
+    netDifference: number;
+}
+
+export interface PurchaseOrderBody {
+    status: PurchaseOrderStatus;
+    expectedDate: string;
+    supplierId: number;
+}
+
+
+/* PURCHASE ORDER LINES */
 export interface PurchaseOrderLine {
     id: number;
     purchaseOrderId: number;
@@ -77,28 +100,6 @@ export interface LineResult {
     status: LineStatus;
 }
 
-export interface PurchaseOrderSummary {
-    purchaseOrderId: number;
-    totalLines: number;
-    discrepancyLines: number;
-    totalExpected: number;
-    totalReceived: number;
-    totalDamaged: number;
-    totalUsableReceived: number;
-    netDifference: number;
-}
-
-export interface PurchaseOrderBody {
-    status: PurchaseOrderStatus;
-    expectedDate: string;
-    supplierId: number;
-}
-
-export interface ReceiptRequestBody {
-    received: number;
-    damaged: number;
-}
-
 export interface PurchaseOrderLineBody {
     purchaseOrderId: number;
     skuId: number;
@@ -108,4 +109,11 @@ export interface PurchaseOrderLineBody {
 export interface PurchaseOrderLineRequestBody {
     skuId: number;
     expectedQuantity: number;
+}
+
+
+/* PURCHASE ORDER LINE RECEIPTS */
+export interface ReceiptRequestBody {
+    received: number;
+    damaged: number;
 }

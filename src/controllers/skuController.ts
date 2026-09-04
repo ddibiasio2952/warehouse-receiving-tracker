@@ -22,6 +22,7 @@ import {
 import {
     getSkus,
     getSku,
+    getSkusBySupplierId,
     addSku,
     updateSku
 } from "../repositories/skuRepository";
@@ -52,7 +53,7 @@ export async function getAllSkus(
     }
 }
 
-// Get a SKU by Id
+// Get a SKU by ID
 export async function getSkuById(
     request: Request<{ id: string }>,
     response: Response
@@ -60,10 +61,10 @@ export async function getSkuById(
     // Convert route param from string to number
     const skuId: number = Number(request.params.id);
 
-    // Validate Id
+    // Validate ID
     if (!isPositiveInteger(skuId)) {
         response.status(400).json({
-            message: "Sku Id must be a positive integer."
+            message: "Sku ID must be a positive integer."
         });
 
         return;
@@ -91,6 +92,38 @@ export async function getSkuById(
     }
 }
 
+// Get SKUs by supplier ID
+
+export async function getSkusBySupplier(
+    request: Request<{ id: string }>,
+    response: Response
+): Promise<void> {
+    // Convert route param from string to number
+    const supplierId = Number(request.params.id);
+
+    // Validate ID
+    if (!isPositiveInteger(supplierId)) {
+        response.status(400).json({
+            message: "Supplier ID must be a positive integer."
+        });
+
+        return;
+    }
+
+    try {
+        // Get all SKUs by supplier ID from repository
+        const result = await getSkusBySupplierId(supplierId);
+
+        response.status(200).json(result);
+    } catch (error) {
+        console.error("Error retrieving SKUs by supplier ID: ", error);
+
+        response.status(500).json({
+            message: "An internal server error occurred."
+        });
+    }
+}
+
 // Post a new SKU
 export async function postSku(
     request: Request<
@@ -103,10 +136,10 @@ export async function postSku(
     // Retrieve body values
     const { skuNumber, description, supplierId } = request.body ?? {};
 
-    // Validate Supplier Id
+    // Validate Supplier ID
     if (!isPositiveInteger(supplierId)) {
         response.status(400).json({
-            message: "Supplier Id must be a positive integer."
+            message: "Supplier ID must be a positive integer."
         });
 
         return;
@@ -201,19 +234,19 @@ export async function putSku(
     // Retrieve body values
     const { skuNumber, description, supplierId } = request.body ?? {};
 
-    // Validate Ids
+    // Validate IDs
     if (!isPositiveInteger(skuId)) {
         response.status(400).json({
-            message: "SKU Id must be a positive integer."
+            message: "SKU ID must be a positive integer."
         });
 
         return;
     }
 
-    // Validate Supplier Id
+    // Validate Supplier ID
     if (!isPositiveInteger(supplierId)) {
         response.status(400).json({
-            message: "Supplier Id must be a positive integer."
+            message: "Supplier ID must be a positive integer."
         });
 
         return;

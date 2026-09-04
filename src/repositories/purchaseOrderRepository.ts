@@ -60,7 +60,7 @@ export async function getPurchaseOrderLinesByOrderId(
         .request()
         .input(
             "purchaseOrderId",
-            sql.Int,    
+            sql.Int,
             purchaseOrderId
         )
         .query<PurchaseOrderLineDetails>(`
@@ -82,6 +82,7 @@ export async function getPurchaseOrderLinesByOrderId(
             INNER JOIN Suppliers
                 ON Suppliers.Id = Skus.SupplierId
             WHERE PurchaseOrderLines.PurchaseOrderId = @purchaseOrderId
+            ORDER BY PurchaseOrderLines.Id ASC;
         `);
 
     // Return with all numerical values set as number types
@@ -132,12 +133,12 @@ export async function getAllPurchaseOrderLines():
     }));
 }
 
-// Retrieve a purchase order line by Id
-export async function getPurchaseOrderLine(lineId: number): 
+// Retrieve a purchase order line by ID
+export async function getPurchaseOrderLine(lineId: number):
     Promise<PurchaseOrderLineDetails | undefined> {
 
     const pool = await getPool();
-    
+
     const result = await pool
         .request()
         .input("lineId", sql.Int, lineId)
@@ -161,14 +162,14 @@ export async function getPurchaseOrderLine(lineId: number):
                 ON Suppliers.Id = Skus.SupplierId
             WHERE PurchaseOrderLines.Id = @lineId;
         `);
-    
+
     const line = result.recordset[0];
 
     if (line === undefined) {
         return undefined;
     }
 
-    return { 
+    return {
         id: Number(line.id),
         purchaseOrderId: Number(line.purchaseOrderId),
         supplierId: Number(line.supplierId),
@@ -298,7 +299,7 @@ export async function addPurchaseOrderLine(
         return undefined;
     }
 
-    return { 
+    return {
         id: Number(newOrderLine.id),
         purchaseOrderId: Number(newOrderLine.purchaseOrderId),
         skuId: Number(newOrderLine.skuId),
@@ -327,20 +328,54 @@ export async function updateReceiptQuantities(
                 ReceivedQuantity = @received,
                 DamagedQuantity = @damaged,
                 ReceiptRecorded = 1
-            WHERE Id = @lineId;
+            FROM PurchaseOrderLines
+            INNER JOIN PurchaseOrders
+                ON PurchaseOrderLines.PurchaseOrderId
+                    = PurchaseOrders.Id                    
+            WHERE PurchaseOrderLines.Id = @lineId
+                AND PurchaseOrders.Status <> 'closed';
+
+            DECLARE @updatedRows INT = @@ROWCOUNT;
+
+            IF @updatedRows = 0
+            BEGIN
+                IF EXISTS (
+                    SELECT 1
+                    FROM PurchaseOrderLines
+                    INNER JOIN PurchaseOrders
+                        ON PurchaseOrders.Id =
+                            PurchaseOrderLines.PurchaseOrderId
+                    WHERE PurchaseOrderLines.Id = @lineId
+                        AND PurchaseOrders.Status = 'closed'
+                )
+                BEGIN
+                    THROW 50001,
+                        'Receipts cannot be recorded for a closed purchase order.',
+                        1;
+                END;
+
+                THROW 50002,
+                    'Purchase order line not found.',
+                    1;
+            END;
 
             SELECT
                 PurchaseOrderLines.Id AS id,
-                PurchaseOrderLines.PurchaseOrderId AS purchaseOrderId,
+                PurchaseOrderLines.PurchaseOrderId
+                    AS purchaseOrderId,
                 PurchaseOrderLines.SkuId AS skuId,
                 Suppliers.Id AS supplierId,
                 Suppliers.Name AS supplierName,
                 Skus.SkuNumber AS skuNumber,
                 Skus.Description AS skuDescription,
-                PurchaseOrderLines.ExpectedQuantity AS expectedQuantity,
-                PurchaseOrderLines.ReceivedQuantity AS receivedQuantity,
-                PurchaseOrderLines.DamagedQuantity AS damagedQuantity,
-                PurchaseOrderLines.ReceiptRecorded AS receiptRecorded
+                PurchaseOrderLines.ExpectedQuantity
+                    AS expectedQuantity,
+                PurchaseOrderLines.ReceivedQuantity
+                    AS receivedQuantity,
+                PurchaseOrderLines.DamagedQuantity
+                    AS damagedQuantity,
+                PurchaseOrderLines.ReceiptRecorded
+                    AS receiptRecorded
             FROM PurchaseOrderLines
             INNER JOIN Skus
                 ON PurchaseOrderLines.SkuId = Skus.Id

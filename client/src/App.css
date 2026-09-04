@@ -18,6 +18,36 @@ ul {
   padding: 0;
 }
 
+button { 
+  margin: 0 0.25rem;
+}
+
+/* App Navigation */
+.app-navigation {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background-color: #1f2937;
+}
+
+.back-link {
+  padding-top: 0.5rem;
+}
+
+.navigation-link {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.navigation-link:hover {
+    text-decoration: underline;
+}
+
+.navigation-link.active {
+    font-weight: bold;
+    color: #93c5fd;
+}
+
 /* Purchase Orders Table */
 .purchase-orders-table {
     margin: 0 auto;
@@ -57,6 +87,23 @@ ul {
   background-color: #eeeeee;
 }
 
+/* Add Line Form */
+.order-line-form {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.order-line-form label {
+  margin-bottom: 0.2rem;
+}
+
+.order-line-form input {
+  margin-bottom: 0.5rem;
+}
+
 /* Receipt Form */
 .receipt-form {
   display: flex;
@@ -68,10 +115,8 @@ ul {
 
 .receipt-form label {
   margin-bottom: 0.2rem;
-  /* border: 0.1rem solid black; */
 }
 
 .receipt-form input {
   margin-bottom: 0.5rem;
-  /* border: 0.1rem solid black; */
 }

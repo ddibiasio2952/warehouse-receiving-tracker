@@ -1,4 +1,4 @@
-// Positive Integer Check for Id Validation
+// Positive Integer Check for ID Validation
 export function isPositiveInteger(value: number): boolean {
     return Number.isInteger(value) && value > 0;
 }

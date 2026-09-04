@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 // Import types
-import type { SubmitEvent  } from "react";
+import type { SubmitEvent } from "react";
 import type {
     ReceiptRequestBody
 } from "../../../../../src/types/types";
@@ -25,7 +25,7 @@ function ReceiptForm({
     // Store the damaged quantity entered by the user
     const [damaged, setDamaged] = useState<number>(0);
 
-    async function handleSubmit(
+    async function handleReceiptSubmit(
         event: SubmitEvent <HTMLFormElement>
     ): Promise<void> {
         event.preventDefault();
@@ -38,8 +38,7 @@ function ReceiptForm({
 
     return (
         <form className="receipt-form"
-            onSubmit={handleSubmit}>
-            <h3>Record Receipt for Line {lineId}</h3>
+            onSubmit={handleReceiptSubmit}>
 
             <label htmlFor="received">
                 Received Quantity
