@@ -1,4 +1,4 @@
-# Receiving Discrepancy Tracker
+# Receiving Tracker
 
 A full-stack warehouse receiving application for comparing expected purchase-order quantities with the quantities actually received and damaged.
 
