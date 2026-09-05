@@ -70,6 +70,10 @@ export function useSuppliers() {
         }
 
         void loadSuppliers();
+
+        return () => {
+            requestWasCancelled = true;
+        }
     }, []);
 
     return {
