@@ -6,7 +6,7 @@ import {
     Link,
     useNavigate,
     useParams
-} from "react-router";
+} from "react-router-dom";
 
 import CloseOrderForm from
     "./components/CloseOrderForm";
@@ -88,7 +88,7 @@ function ClosePurchaseOrderPage() {
 
     if (!isValidOrderId) {
         return (
-            <main className="app-container">
+            <main className="page-container">
                 <h1>Invalid Purchase Order</h1>
 
                 <p className="error-message">
@@ -103,7 +103,7 @@ function ClosePurchaseOrderPage() {
     }
 
     return (
-        <main className="app-container">
+        <main className="page-container">
             <Link
                 className="back-link"
                 to={`/purchase-orders/${orderId}`}

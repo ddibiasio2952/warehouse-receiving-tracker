@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 import type {
     PurchaseOrderDetails
@@ -12,6 +12,8 @@ type PurchaseOrderTableProps = {
 function PurchaseOrderTable({
     purchaseOrders
 }: PurchaseOrderTableProps) {
+    const navigate = useNavigate();
+
     return (
         <table className="purchase-orders-table">
             <thead>
@@ -42,14 +44,15 @@ function PurchaseOrderTable({
                         </td>
 
                         <td>
-                            <Link
-                                to={
-                                    `/purchase-orders/` +
-                                    purchaseOrder.id
-                                }
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    navigate(
+                                        `/purchase-orders/${purchaseOrder.id}`
+                                    )}
                             >
                                 View Details
-                            </Link>
+                            </button>
                         </td>
                     </tr>
                 ))}

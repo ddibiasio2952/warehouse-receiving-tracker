@@ -52,10 +52,10 @@ purchaseOrderRouter.get(
     getLineByLineId
 );
 
-// POST /api/purchase-orders/new-order
+// POST /api/purchase-orders/add
 // Post a new PO
 purchaseOrderRouter.post(
-    "/new-order",
+    "/add",
     postOrder
 )
 

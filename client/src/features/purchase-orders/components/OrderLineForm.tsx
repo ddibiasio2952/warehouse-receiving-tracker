@@ -8,7 +8,6 @@ import type {
 } from "../../../../../src/types/types";
 
 // Props
-
 type OrderLineFormProps = {
     orderId: number,
     skusBySupplier: Sku[];
@@ -65,7 +64,7 @@ function OrderLineForm({
                         key={sku.id}
                         value={sku.id}
                     >
-                        {sku.skuNumber} — {sku.description}
+                        {sku.skuNumber} - {sku.description}
                     </option>
                 ))}
             </select>

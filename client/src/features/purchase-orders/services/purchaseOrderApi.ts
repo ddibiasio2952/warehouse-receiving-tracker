@@ -1,5 +1,7 @@
 import type {
+    PurchaseOrder,
     PurchaseOrderDetails,
+    PurchaseOrderBody,
     LineResult,
     PurchaseOrderLine,
     PurchaseOrderLineDetails,
@@ -61,6 +63,32 @@ export async function getPurchaseOrderLine(
     return data;
 }
 
+// Add a purchase order
+export async function addPurchaseOrder(
+    purchaseOrderBody: PurchaseOrderBody
+): Promise<PurchaseOrder> {
+    const response = await fetch(
+        "/api/purchase-orders/add",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(purchaseOrderBody)
+        }
+    );
+
+    // Throw an error if the request is unsuccessful
+    if (!response.ok) {
+        throw new Error("Failed to add new purchase order.");
+    }
+
+    // Convert the response into a purchase order details object
+    const data: PurchaseOrder = await response.json();
+
+    return data;
+}
+
 // Add a purchase order line to a purchase order
 export async function addPurchaseOrderLine(
     orderId: number,
@@ -88,7 +116,7 @@ export async function addPurchaseOrderLine(
     return data;
 }
 
-// Record received and damaged quantities for one purchase order line
+// Record receipt for one purchase order line
 export async function recordReceipt(
     lineId: number,
     receipt: ReceiptRequestBody

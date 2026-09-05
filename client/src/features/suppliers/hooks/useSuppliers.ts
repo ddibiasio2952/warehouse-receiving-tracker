@@ -4,45 +4,46 @@ import {
 } from "react";
 
 import type {
-    PurchaseOrderDetails
+    Supplier
 } from "../../../../../src/types/types";
 
-import { getPurchaseOrders } from "../services/purchaseOrderApi";
+import {
+    getSuppliers
+} from "../services/supplierApi";
 
-
-export function usePurchaseOrders() {
-    // Store purchase orders returned by the API
+export function useSuppliers() {
+    // Store suppliers returned by the API
     const [
-        purchaseOrders,
-        setPurchaseOrders
-    ] = useState<PurchaseOrderDetails[]>([]);
+        suppliers,
+        setSuppliers
+    ] = useState<Supplier[]>([]);
 
-    // Store an error from retrieving purchase orders
+    // Store an error from retrieving suppliers
     const [
         errorMessage,
         setErrorMessage
     ] = useState<string | null>(null);
 
-    // Track whether purchase orders are loading
+    // Track whether suppliers are loading
     const [
         isLoading,
         setIsLoading
     ] = useState<boolean>(true);
 
-    // Retrieve purchase orders when the hook first runs
+    // Retrieve suppliers when the hook first runs
     useEffect(() => {
         let requestWasCancelled = false;
 
-        async function loadPurchaseOrders(): Promise<void> {
+        async function loadSuppliers(): Promise<void> {
             try {
                 setIsLoading(true);
                 setErrorMessage(null);
 
                 const data =
-                    await getPurchaseOrders();
+                    await getSuppliers();
 
                 if (!requestWasCancelled) {
-                    setPurchaseOrders(data);
+                    setSuppliers(data);
                 }
             } catch (error) {
                 if (requestWasCancelled) {
@@ -50,15 +51,16 @@ export function usePurchaseOrders() {
                 }
 
                 console.error(
-                    "Error retrieving purchase orders: ",
+                    "Error retrieving suppliers: ",
                     error
                 );
 
                 // Use empty array
-                setPurchaseOrders([]);
+                setSuppliers([]);
 
+                // Ignore results if the component unmounts
                 setErrorMessage(
-                    "Unable to load purchase orders."
+                    "Unable to load suppliers."
                 );
             } finally {
                 if (!requestWasCancelled) {
@@ -67,16 +69,11 @@ export function usePurchaseOrders() {
             }
         }
 
-        void loadPurchaseOrders();
-
-        // Ignore results if the component unmounts
-        return () => {
-            requestWasCancelled = true;
-        };
+        void loadSuppliers();
     }, []);
 
     return {
-        purchaseOrders,
+        suppliers,
         errorMessage,
         isLoading
     };

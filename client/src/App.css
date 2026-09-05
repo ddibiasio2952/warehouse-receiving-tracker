@@ -1,5 +1,5 @@
 /* General Rules */
-.app-container {
+main, .page-container, .navigation {
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -22,8 +22,24 @@ button {
   margin: 0 0.25rem;
 }
 
-/* App Navigation */
-.app-navigation {
+label {
+  margin-bottom: 0.2rem;
+}
+
+input, select {
+  margin-bottom: 0.5rem;
+}
+
+select {
+  padding: 0.2rem;
+}
+
+.object-actions {
+  padding-bottom: 0.7rem;
+}
+
+/* Header Navigation */
+.header-navigation {
     display: flex;
     gap: 1rem;
     padding: 1rem 2rem;
@@ -48,44 +64,43 @@ button {
     color: #93c5fd;
 }
 
-/* Purchase Orders Table */
-.purchase-orders-table {
+
+/* Tables */
+table {
     margin: 0 auto;
     border-collapse: collapse;
 }
 
-.purchase-orders-table th,
-.purchase-orders-table td {
+table th,
+table td {
   padding: 0.75rem 1rem;
   border: 1px solid #cccccc;
   text-align: left;
 }
 
-.purchase-orders-table th {
+table th {
   background-color: #eeeeee;
 }
+
+/* Purchase Orders Table */
 
 .selected-supplier-name {
   font-weight: bold;
   color: rgb(104, 21, 159);
 }
 
+/* Add Purchase Order Form */
+.add-order-form {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+
 /* Line Reports Table */
-.line-reports-table {
-  margin: 1rem auto 0;
-  border-collapse: collapse;
-}
 
-.line-reports-table th,
-.line-reports-table td {
-  padding: 0.75rem 1rem;
-  border: 1px solid #ccc;
-  text-align: center;
-}
-
-.line-reports-table th {
-  background-color: #eeeeee;
-}
 
 /* Add Line Form */
 .order-line-form {
@@ -96,13 +111,6 @@ button {
   align-items: center;
 }
 
-.order-line-form label {
-  margin-bottom: 0.2rem;
-}
-
-.order-line-form input {
-  margin-bottom: 0.5rem;
-}
 
 /* Receipt Form */
 .receipt-form {
@@ -113,10 +121,18 @@ button {
   align-items: center;
 }
 
-.receipt-form label {
-  margin-bottom: 0.2rem;
+
+/* Add SKU Form */
+.add-sku-form {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
-.receipt-form input {
-  margin-bottom: 0.5rem;
+/* Navigation */
+
+.navigation a {
+  padding: 0.3rem;
 }
