@@ -39,52 +39,57 @@ function AddPurchaseOrderForm({
             status
         });
     }
-    
+
     return (
         <form className="add-order-form"
             onSubmit={handleOrderSubmit}>
-                <h3>Submit New Purchase Order</h3>
+            <h3>Submit New Purchase Order</h3>
 
-                <label htmlFor="supplier-id">
-                    Supplier
-                </label>
-                <select
-                    id="supplierId"
-                    value={supplierId}
-                    onChange={(event) =>
-                        setSupplierId(Number(event.target.value))   
-                    }
-                >
-                    <option value={0}>
-                        Select a Supplier
+            <label htmlFor="supplier-id">
+                Supplier
+            </label>
+            <select
+                id="supplierId"
+                value={supplierId}
+                onChange={(event) =>
+                    setSupplierId(Number(event.target.value))
+                }
+            >
+                <option value={0}>
+                    Select a Supplier
+                </option>
+
+                {suppliers.map((supplier) => (
+                    <option
+                        key={supplier.id}
+                        value={supplier.id}
+                    >
+                        {supplier.name}
                     </option>
+                ))}
+            </select>
 
-                    {suppliers.map((supplier) => (
-                        <option
-                            key={supplier.id}
-                            value={supplier.id}
-                        >
-                            {supplier.name}
-                        </option>
-                    ))}
-                </select>
+            <label htmlFor="expectedDate">
+                Expected Date
+            </label>
+            <input
+                id="expectedDate"
+                type="date"
+                value={expectedDate}
+                onChange={(event) =>
+                    setExpectedDate(event.target.value)
+                }
+                required
+            />
 
-                <label htmlFor="expectedDate">
-                    Expected Date
-                </label>
-                <input
-                    id="expectedDate"
-                    type="date"
-                    value={expectedDate}
-                    onChange={(event) =>
-                            setExpectedDate(event.target.value)
-                    }
-                />
-
-                <button type="submit">
-                    Add Purchase Order
-                </button>
-            </form>
+            <button
+                type="submit"
+                disabled={
+                    supplierId === 0
+                }>
+                Add Purchase Order
+            </button>
+        </form>
     )
 }
 

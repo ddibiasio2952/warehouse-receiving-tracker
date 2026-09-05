@@ -38,24 +38,80 @@ select {
   padding-bottom: 0.7rem;
 }
 
+.back-link {
+  color: #1f2937;
+  padding-top: 0.5rem;
+}
+
 /* Header Navigation */
 .header-navigation {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem 2rem;
+    padding: 0 2rem;
     background-color: #1f2937;
 }
 
-.back-link {
-  padding-top: 0.5rem;
+/* Arrange only the main feature items horizontally */
+.header-navigation > ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Provides an anchor for the absolute submenu */
+.header-navigation .nav-item {
+    position: relative;
+    list-style: none;
+    border-radius: 0.4rem;
+}
+
+.header-navigation a {
+    display: block;
+    padding: 1rem;
+    text-decoration: none;
+}
+
+/* Position submenu beneath its feature */
+.header-navigation .sub-menu {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    min-width: max-content;
+    padding: 0;
+    background-color: #1f2937;
+    transition:
+        visibility 0.2s ease,
+        opacity 0.2s ease;
+}
+
+/* Keep submenu items vertical */
+.header-navigation .sub-menu li {
+    display: block;
+}
+
+/* Reveal submenu with mouse or keyboard */
+.header-navigation .nav-item:hover > .sub-menu,
+.header-navigation .nav-item:focus-within > .sub-menu {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Hide previously focused submenus while hovering another feature */
+.header-navigation > ul:hover
+.nav-item:not(:hover) > .sub-menu {
+    visibility: hidden;
+    opacity: 0;
 }
 
 .navigation-link {
     color: #ffffff;
-    text-decoration: none;
 }
 
 .navigation-link:hover {
+    color: #ffffff;
     text-decoration: underline;
 }
 
@@ -82,15 +138,8 @@ table th {
   background-color: #eeeeee;
 }
 
-/* Purchase Orders Table */
-
-.selected-supplier-name {
-  font-weight: bold;
-  color: rgb(104, 21, 159);
-}
-
-/* Add Purchase Order Form */
-.add-order-form {
+/* Forms */
+form {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -98,41 +147,15 @@ table th {
   align-items: center;
 }
 
-
-/* Line Reports Table */
-
-
-/* Add Line Form */
-.order-line-form {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-
-
-/* Receipt Form */
-.receipt-form {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-
-
-/* Add SKU Form */
-.add-sku-form {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Navigation */
-
+/* Main Feature Navigation */
 .navigation a {
+  color: #1f2937;
   padding: 0.3rem;
+  text-decoration: none;
+}
+
+.navigation a:hover {
+  color: #1f2937;
+  padding: 0.3rem;
+  text-decoration: underline;
 }

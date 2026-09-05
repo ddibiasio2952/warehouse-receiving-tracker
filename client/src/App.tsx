@@ -123,7 +123,7 @@ function App() {
 
                 {/* Edit a SKU */}
                 <Route
-                    path="/skus/:skuId/edit"
+                    path="/skus/:skuIdParam/edit"
                     element={<EditSkuPage />}
                 />
             </Routes>

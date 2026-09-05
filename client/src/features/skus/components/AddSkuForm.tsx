@@ -25,8 +25,8 @@ function AddSkuForm({
     // Store the SKU number entered by the user
     const [skuNumber, setSkuNumber] = useState<string>("");
 
-    // Store the SKU description
-    const [skuDescription, setSkuDescription] = useState<string>("");    
+    // Store the SKU description entered by the user
+    const [skuDescription, setSkuDescription] = useState<string>("");
 
     async function handleSkuSubmit(
         event: SubmitEvent<HTMLFormElement>
@@ -43,61 +43,67 @@ function AddSkuForm({
     return (
         <form className="add-sku-form"
             onSubmit={handleSkuSubmit}>
-                <h3>Submit New SKU</h3>
+            <h3>Submit New SKU</h3>
 
-                <label htmlFor="supplier-id">
-                    Supplier
-                </label>
-                <select
-                    id="supplierId"
-                    value={supplierId}
-                    onChange={(event) =>
-                        setSupplierId(Number(event.target.value))
-                    }
-                >
-                    <option value={0}>
-                        Select a Supplier
+            <label htmlFor="supplier-id">
+                Supplier
+            </label>
+            <select
+                id="supplierId"
+                value={supplierId}
+                onChange={(event) =>
+                    setSupplierId(Number(event.target.value))
+                }
+            >
+                <option value={0}>
+                    Select a Supplier
+                </option>
+
+                {suppliers.map((supplier) => (
+                    <option
+                        key={supplier.id}
+                        value={supplier.id}
+                    >
+                        {supplier.name}
                     </option>
-
-                    {suppliers.map((supplier) => (
-                        <option
-                            key={supplier.id}
-                            value={supplier.id}
-                        >
-                            {supplier.name}
-                        </option>
-                    ))}
-                </select>
+                ))}
+            </select>
 
 
-                <label htmlFor="sku-number">
-                    SKU Number
-                </label>
-                <input
-                    id="sku-number"
-                    type="text"
-                    value={skuNumber}
-                    onChange={(event) =>
-                        setSkuNumber(event.target.value)   
-                    }
-                />
+            <label htmlFor="sku-number">
+                SKU Number
+            </label>
+            <input
+                id="sku-number"
+                type="text"
+                value={skuNumber}
+                onChange={(event) =>
+                    setSkuNumber(event.target.value)
+                }
+                required
+            />
 
-                <label htmlFor="description">
-                    Description
-                </label>
-                <input
-                    id="description"
-                    type="text"
-                    value={skuDescription}
-                    onChange={(event) =>
-                            setSkuDescription(event.target.value)
-                    }
-                />
+            <label htmlFor="description">
+                Description
+            </label>
+            <input
+                id="description"
+                type="text"
+                value={skuDescription}
+                onChange={(event) =>
+                    setSkuDescription(event.target.value)
+                }
+                required
+            />
 
-                <button type="submit">
-                    Add SKU
-                </button>
-            </form>
+            <button
+                type="submit"
+                disabled={
+                    supplierId === 0
+                }>
+                Add SKU
+            </button>
+        </form>
     )
 }
 

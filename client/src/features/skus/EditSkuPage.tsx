@@ -10,7 +10,6 @@ import {
 } from "react-router-dom";
 
 import type {
-    Supplier,
     Sku,
     SkuRequestBody
 } from "../../../../src/types/types";
@@ -37,19 +36,19 @@ function EditSkuPage() {
     }>();
 
     const skuId = Number(skuIdParam);
-    
+
     // Load suppliers
     const {
         suppliers,
         errorMessage: suppliersError,
-        isLoading: suppliersLoading
+        isLoading: areSuppliersLoading
     } = useSuppliers();
 
-    // Store the selected SKU
+    // Store the retrieved SKU before editing
     const [
-        skuBody,
-        setSkuBody
-    ] = useState<SkuRequestBody | null>(null);
+        skuBeforeEdit,
+        setSkuBeforeEdit
+    ] = useState<Sku | null>(null);
 
     // Track whether the SKU is loading
     const [
@@ -81,7 +80,7 @@ function EditSkuPage() {
 
     // Retrieve the selected SKU
     useEffect(() => {
-        if(!hasValidParameters) {
+        if (!hasValidParameters) {
             return;
         }
 
@@ -93,14 +92,14 @@ function EditSkuPage() {
                 setIsSkuLoading(true);
                 setLoadSkuErrorMessage(null);
 
-                const data = 
+                const data =
                     await getSkuById(validSkuId);
 
                 if (requestWasCancelled) {
                     return;
                 }
 
-                setSkuBody(data);
+                setSkuBeforeEdit(data);
             } catch (error) {
                 if (requestWasCancelled) {
                     return;
@@ -110,7 +109,7 @@ function EditSkuPage() {
                     "Error retrieving SKU: ", error
                 );
 
-                setSkuBody(null);
+                setSkuBeforeEdit(null);
 
                 setLoadSkuErrorMessage(
                     error instanceof Error
@@ -125,7 +124,7 @@ function EditSkuPage() {
         }
 
         void loadSkuDetails();
-        
+
         // Ignore results if the page unmounts
         return () => {
             requestWasCancelled = true;
@@ -149,13 +148,13 @@ function EditSkuPage() {
                 skuBody
             );
 
-            // Return to the SKU details
+            // Return to view all SKUs
             navigate(
-                `/skus/${skuId}`
+                `/skus/all`
             );
         } catch (error) {
             console.error(
-                "Error editign SKU: ", error
+                "Error editing SKU: ", error
             );
 
             setEditSkuErrorMessage(
@@ -163,7 +162,7 @@ function EditSkuPage() {
                     ? error.message
                     : "Unable to edit the SKU."
             );
-        }finally {
+        } finally {
             setIsEditingSku(false);
         }
     }
@@ -196,16 +195,74 @@ function EditSkuPage() {
 
             <h1>Edit SKU</h1>
 
-        {/* Edit SKU form */}
-            {!suppliersLoading &&
+            {/* Supplier loading condition */}
+            {areSuppliersLoading && (
+                <p>Loading suppliers...</p>
+            )}
+
+            {/* Suppliers error condition */}
+            {suppliersError && (
+                <p className="error-message">
+                    {suppliersError}
+                </p>
+            )}
+
+            {/* Suppliers not found condition */}
+            {!areSuppliersLoading &&
+                !suppliersError &&
+                suppliers.length === 0 && (
+                    <p className="error-message">
+                        Suppliers not found.
+                    </p>
+
+                )}
+
+            {/* SKU Loading condition */}
+            {isSkuLoading && (
+                <p>Loading SKU to edit...</p>
+            )}
+
+            {/* SKU loading error */}
+            {loadSkuErrorMessage && (
+                <p className="error-message">
+                    {loadSkuErrorMessage}
+                </p>
+            )}
+
+            {/* SKU not found condition */}
+            {!isSkuLoading &&
+                !loadSkuErrorMessage &&
+                !skuBeforeEdit && (
+                    <p className="error-message">
+                        SKU to edit not found.
+                    </p>
+                )}
+
+            {/* Edit submission error */}
+            {editSkuErrorMessage && (
+                <p className="error-message">
+                    {editSkuErrorMessage}
+                </p>
+            )}
+
+            {/* Edit SKU loading condition */}
+            {isEditingSku && (
+                <p>Editing SKU...</p>
+            )}
+
+            {/* Edit SKU form */}
+            {!areSuppliersLoading &&
                 !suppliersError &&
                 suppliers &&
                 !isSkuLoading &&
                 !loadSkuErrorMessage &&
-                skuBody && (
+                skuBeforeEdit && (
                     <EditSkuForm
-                        skuId={skuId}
-                        onSubmit={handleEditSku}
+                        suppliers={suppliers}
+                        sku={skuBeforeEdit}
+                        onSubmit={(skuBody) =>
+                            handleEditSku(skuId, skuBody)
+                        }
                     />
                 )}
         </main>

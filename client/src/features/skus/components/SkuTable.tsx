@@ -39,7 +39,7 @@ function SkuTable({
                                 type="button"
                                 onClick={() =>
                                     navigate(
-                                        `/skus/${sku.id}`
+                                        `/skus/${sku.id}/edit`
                                     )}
                             >
                                 Modify
