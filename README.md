@@ -228,4 +228,5 @@ This repository is provided for portfolio and demonstration purposes. The source
 ## Author
 
 Daniel DiBiasio
+
 [GitHub](https://github.com/ddibiasio2952/)
