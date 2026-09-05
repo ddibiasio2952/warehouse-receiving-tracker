@@ -49,7 +49,7 @@ The project is based on a real warehouse workflow: receiving staff record shipme
 ## Project Structure
 
 ```text
-receiving-discrepancy-tracker/
+warehouse-receiving-tracker/
 ├── client/
 │   └── src/
 │       ├── components/          Shared interface components
@@ -98,7 +98,7 @@ The included environment example assumes a local SQL Server Express instance nam
 
 ```powershell
 git clone <repository-url>
-cd receiving-discrepancy-tracker
+cd warehouse-receiving-tracker
 npm install
 ```
 
