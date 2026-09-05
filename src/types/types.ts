@@ -4,6 +4,12 @@ export type LineStatus = "shortage" | "overage" | "match";
 
 /* INTERFACES */
 
+/* SUPPLIERS */
+export interface Supplier {
+    id: number;
+    name: string;
+}
+
 /* SKUS */
 export interface Sku {
     id: number;
@@ -25,7 +31,6 @@ export interface SkuRetrieveBody {
     supplierId: number;
     supplierName: string;
 }
-
 
 /* PURCHASE ORDERS */
 export interface PurchaseOrder {

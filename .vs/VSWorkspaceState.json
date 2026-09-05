@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\client",
+    "\\client\\src",
+    "\\client\\src\\components\\layout",
+    "\\client\\src\\features",
+    "\\client\\src\\features\\purchase-orders",
+    "\\client\\src\\features\\purchase-orders\\components",
+    "\\client\\src\\features\\skus",
+    "\\client\\src\\features\\skus\\components",
+    "\\client\\src\\features\\skus\\services"
+  ],
+  "SelectedNode": "\\client\\src\\features\\purchase-orders\\components\\OrderLineForm.tsx",
+  "PreviewInSolutionExplorer": false
+}

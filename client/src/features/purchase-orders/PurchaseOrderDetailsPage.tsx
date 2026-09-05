@@ -2,7 +2,7 @@ import {
     Link,
     useNavigate,
     useParams
-} from "react-router";
+} from "react-router-dom";
 
 import LineReportTable from
     "./components/LineReportTable";
@@ -70,7 +70,7 @@ function PurchaseOrderDetailsPage() {
     // Invalid URL parameter
     if (validOrderId === null) {
         return (
-            <main className="app-container">
+            <main className="page-container">
                 <h1>Invalid Purchase Order</h1>
 
                 <p className="error-message">
@@ -86,10 +86,10 @@ function PurchaseOrderDetailsPage() {
     }
 
     return (
-        <main className="app-container">
+        <main className="page-container">
             <Link 
                 className="back-link"
-                to="/purchase-orders">
+                to="/purchase-orders/all">
                 Back to Purchase Orders
             </Link>
 
@@ -149,7 +149,7 @@ function PurchaseOrderDetailsPage() {
                         {/* Purchase order actions */}
                         {purchaseOrder.status !==
                             "closed" && (
-                            <section>
+                            <section className="object-actions">
                                 <button
                                     type="button"
                                     onClick={handleAddLine}

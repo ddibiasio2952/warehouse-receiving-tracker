@@ -7,31 +7,36 @@ import { getPool } from "../config/database";
 // Import interface types
 import {
     Sku,
-    SkuRequestBody
+    SkuRequestBody,
+    SkuRetrieveBody
 } from "../types/types"
 
 // Retrieve every SKU
 export async function getSkus():
-    Promise<Sku[]> {
+    Promise<SkuRetrieveBody[]> {
     const pool = await getPool();
 
     const result = await pool
         .request()
-        .query<Sku>(`
+        .query<SkuRetrieveBody>(`
             SELECT
-                Id AS id,
-                SkuNumber AS skuNumber,
-                Description AS description,
-                SupplierId as supplierId                
+                Skus.Id AS id,
+                Skus.SkuNumber AS skuNumber,
+                Skus.Description AS description,
+                Skus.SupplierId as supplierId,           
+                Suppliers.Name AS supplierName
             FROM Skus
-            ORDER BY Id 
+            INNER JOIN Suppliers
+                On Skus.SupplierId = Suppliers.Id
+            ORDER BY SkuNumber ASC; 
         `);
 
     return result.recordset.map(sku => ({
         id: Number(sku.id),
         skuNumber: sku.skuNumber,
         description: sku.description,
-        supplierId: sku.supplierId
+        supplierId: sku.supplierId,
+        supplierName: sku.supplierName
     }));
 }
 

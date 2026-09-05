@@ -7,7 +7,7 @@ import {
     Link,
     useNavigate,
     useParams
-} from "react-router";
+} from "react-router-dom";
 
 import type {
     PurchaseOrderLineDetails,
@@ -41,6 +41,7 @@ function RecordReceiptPage() {
     const orderId = Number(purchaseOrderId);
     const purchaseOrderLineId = Number(lineId);
 
+    // Load purchase orders
     const {
         purchaseOrders,
         errorMessage: purchaseOrderErrorMessage,
@@ -109,9 +110,7 @@ function RecordReceiptPage() {
                 setLineErrorMessage(null);
 
                 const data =
-                    await getPurchaseOrderLine(
-                        validLineId
-                    );
+                    await getPurchaseOrderLine(validLineId);
 
                 if (requestWasCancelled) {
                     return;
@@ -194,7 +193,7 @@ function RecordReceiptPage() {
             );
         } catch (error) {
             console.error(
-                "Error recording receipt:",
+                "Error recording receipt: ",
                 error
             );
 
@@ -211,22 +210,22 @@ function RecordReceiptPage() {
     // Reject invalid URL parameters
     if (!hasValidParameters) {
         return (
-            <main className="app-container">
+            <main className="page-container">
                 <h1>Invalid Receipt Request</h1>
 
                 <p className="error-message">
                     The purchase order or line ID is invalid.
                 </p>
 
-                <Link to="/purchase-orders">
-                    Return to Purchase Orders
+                <Link to="/purchase-orders/all">
+                    Return to View All Purchase Orders
                 </Link>
             </main>
         );
     }
 
     return (
-        <main className="app-container">
+        <main className="page-container">
             <Link
                 className="back-link"
                 to={`/purchase-orders/${orderId}`}

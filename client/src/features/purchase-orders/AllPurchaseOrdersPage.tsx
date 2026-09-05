@@ -1,10 +1,16 @@
+import {
+    useNavigate
+} from "react-router-dom";
+
 import PurchaseOrderTable from
     "./components/PurchaseOrderTable";
 
 import { usePurchaseOrders } from
     "./hooks/usePurchaseOrders";
 
-function PurchaseOrdersPage() {
+function AllPurchaseOrdersPage() {
+    const navigate = useNavigate();
+
     const {
         purchaseOrders,
         errorMessage,
@@ -12,8 +18,24 @@ function PurchaseOrdersPage() {
     } = usePurchaseOrders();
 
     return (
-        <main className="app-container">
+        <main className="page-container">
             <h1>Purchase Orders</h1>
+
+            {/* Purchase order actions */}
+            {(
+                <section className="object-actions">
+                    <button
+                        type="button"
+                        onClick={() =>
+                            navigate(
+                                "/purchase-orders/add"
+                            )
+                        }
+                    >
+                        Add Purchase Order
+                    </button>
+                </section>
+            )}
 
             {/* Loading condition */}
             {isLoading && (
@@ -37,4 +59,4 @@ function PurchaseOrdersPage() {
     );
 }
 
-export default PurchaseOrdersPage;
+export default AllPurchaseOrdersPage;

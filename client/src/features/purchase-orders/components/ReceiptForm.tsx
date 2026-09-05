@@ -52,6 +52,7 @@ function ReceiptForm({
                 onChange={(event) =>
                     setReceived(Number(event.target.value))
                 }
+                required
             />
 
             <label htmlFor="damaged">
@@ -66,6 +67,7 @@ function ReceiptForm({
                 onChange={(event) =>
                     setDamaged(Number(event.target.value))
                 }
+                required
             />
 
             <button type="submit">

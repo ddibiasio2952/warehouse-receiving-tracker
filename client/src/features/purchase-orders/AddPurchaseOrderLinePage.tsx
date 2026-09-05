@@ -4,7 +4,7 @@ import {
     Link,
     useNavigate,
     useParams
-} from "react-router";
+} from "react-router-dom";
 
 import type {
     PurchaseOrderLineRequestBody
@@ -17,7 +17,7 @@ import { usePurchaseOrders } from
     "./hooks/usePurchaseOrders";
 
 import { useSkusBySupplier } from
-    "./hooks/useSkusBySupplier";
+    "../skus/hooks/useSkusBySupplier";
 
 import { addPurchaseOrderLine } from
     "./services/purchaseOrderApi";
@@ -48,8 +48,8 @@ function AddPurchaseOrderLinePage() {
     // Load SKUs belonging to the order's supplier
     const {
         skusBySupplier,
-        skusBySupplierError,
-        skusBySupplierLoading
+        errorMessage: skusBySupplierError,
+        isLoading: skusBySupplierLoading
     } = useSkusBySupplier(
         purchaseOrder?.supplierId ?? null
     );
@@ -106,7 +106,7 @@ function AddPurchaseOrderLinePage() {
     // Display an invalid ID error
     if (!isValidOrderId) {
         return (
-            <main className="app-container">
+            <main className="page-container">
                 <h1>Invalid Purchase Order</h1>
 
                 <p className="error-message">
@@ -121,7 +121,7 @@ function AddPurchaseOrderLinePage() {
     }
 
     return (
-        <main className="app-container">
+        <main className="page-container">
             <Link
                 className="back-link"
                 to={`/purchase-orders/${orderId}`}

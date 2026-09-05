@@ -22,14 +22,14 @@ export function useSkusBySupplier(
 
     // Store an error from retrieving SKUs
     const [
-        skusBySupplierError,
-        setSkusBySupplierError
+        errorMessage,
+        setErrorMessage
     ] = useState<string | null>(null);
 
     // Track whether SKUs are loading
     const [
-        skusBySupplierLoading,
-        setSkusBySupplierLoading
+        isLoading,
+        setIsLoading
     ] = useState<boolean>(true);
 
     // Retrieve SKUS when the hook first runs
@@ -45,8 +45,8 @@ export function useSkusBySupplier(
 
         async function loadSkusBySupplier(): Promise<void> {
             try {
-                setSkusBySupplierLoading(true);
-                setSkusBySupplierError(null);
+                setIsLoading(true);
+                setErrorMessage(null);
 
                 const data =
                     await getSkusBySupplierId(validSupplierId);
@@ -64,14 +64,16 @@ export function useSkusBySupplier(
                     error
                 );
 
+                // Use empty array
                 setSkusBySupplier([]);
 
-                setSkusBySupplierError(
+                // Ignore results if the component unmounts
+                setErrorMessage(
                     "Unable to load SKUs by supplier."
                 );
             } finally {
                 if (!requestWasCancelled) {
-                    setSkusBySupplierLoading(false);
+                    setIsLoading(false);
                 }
             }
         }
@@ -86,7 +88,7 @@ export function useSkusBySupplier(
 
     return {
         skusBySupplier,
-        skusBySupplierError,
-        skusBySupplierLoading
+        errorMessage,
+        isLoading
     };
 }

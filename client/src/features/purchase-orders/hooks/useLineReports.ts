@@ -33,7 +33,7 @@ export function useLineReports(
         setLineErrorMessage
     ] = useState<string | null>(null);
 
-    // Retrieve lines when the purchase order ID changes
+    // Retrieve lines when the purchase order changes
     useEffect(() => {
         if (purchaseOrderId === null) {
             return;
@@ -64,7 +64,8 @@ export function useLineReports(
                     "Error retrieving line reports: ",
                     error
                 );
-
+                
+                // Use empty array
                 setLineReports([]);
 
                 setLineErrorMessage(
