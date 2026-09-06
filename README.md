@@ -109,7 +109,7 @@ The included environment example assumes a local SQL Server Express instance nam
 
 1. Clone the repository and install the server dependencies:
 
-```powershell
+```bash
 git clone https://github.com/ddibiasio2952/warehouse-receiving-tracker.git
 cd warehouse-receiving-tracker
 npm install
@@ -117,7 +117,7 @@ npm install
 
 2. Install the client dependencies:
 
-```powershell
+```bash
 cd client
 npm install
 cd ..
@@ -127,7 +127,7 @@ cd ..
 
 Create a local `.env` file from the example:
 
-```powershell
+```bash
 Copy-Item .env.example .env
 ```
 
@@ -158,7 +158,7 @@ Always run `schema.sql` before `seed.sql`. The seed data represents the scenario
 
 Start the API from the repository root:
 
-```powershell
+```bash
 npm run go
 ```
 
@@ -166,7 +166,7 @@ This compiles the TypeScript server and starts the generated application from `d
 
 In a second terminal, start the React development server:
 
-```powershell
+```bash
 cd client
 npm run dev
 ```
