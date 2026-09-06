@@ -168,7 +168,7 @@ http://localhost:5173
 
 A useful way to evaluate the application is:
 
-1. View the seeded suppliers and SKUs.
+1. View the seeded purchase orders and SKUs.
 2. Open a purchase order and inspect its expected line quantities.
 3. Record received and damaged quantities for an eligible line.
 4. Review the calculated usable quantity and discrepancy.
@@ -218,6 +218,11 @@ The application validates identifiers, quantities, dates, supplier data, and SKU
 ## Project Status
 
 This project is under active development as a portfolio demonstration of full-stack TypeScript development and warehouse-domain problem solving.
+
+## Current Limitations
+
+- Purchase-order review data is available through the API, but a dedicated review page has not yet been implemented.
+- Suppliers support the application’s data relationships, but dedicated supplier viewing and creation pages have not yet been implemented.
 
 ## License
 
