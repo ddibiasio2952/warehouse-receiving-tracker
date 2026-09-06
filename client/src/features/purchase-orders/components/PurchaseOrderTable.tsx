@@ -4,6 +4,9 @@ import type {
     PurchaseOrderDetails
 } from "../../../../../src/types/types";
 
+import { formatDate } from
+    "../../../utilities/formatDate";
+
 // Props
 type PurchaseOrderTableProps = {
     purchaseOrders: PurchaseOrderDetails[];
@@ -38,9 +41,7 @@ function PurchaseOrderTable({
                         <td>{purchaseOrder.status}</td>
 
                         <td>
-                            {new Date(
-                                purchaseOrder.expectedDate
-                            ).toLocaleDateString()}
+                            {formatDate(purchaseOrder.expectedDate)}
                         </td>
 
                         <td>

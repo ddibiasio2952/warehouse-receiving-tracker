@@ -7,6 +7,9 @@ import {
 import LineReportTable from
     "./components/LineReportTable";
 
+import { formatDate } from
+    "../../utilities/formatDate";
+
 import { usePurchaseOrders } from
     "./hooks/usePurchaseOrders";
 
@@ -87,7 +90,7 @@ function PurchaseOrderDetailsPage() {
 
     return (
         <main className="page-container">
-            <Link 
+            <Link
                 className="back-link"
                 to="/purchase-orders/all">
                 Back to Purchase Orders
@@ -139,34 +142,31 @@ function PurchaseOrderDetailsPage() {
 
                             <p>
                                 Expected Date:{" "}
-                                {new Date(
-                                    purchaseOrder
-                                        .expectedDate
-                                ).toLocaleDateString()}
+                                {formatDate(purchaseOrder.expectedDate)}
                             </p>
                         </section>
 
                         {/* Purchase order actions */}
                         {purchaseOrder.status !==
                             "closed" && (
-                            <section className="object-actions">
-                                <button
-                                    type="button"
-                                    onClick={handleAddLine}
-                                >
-                                    Add Line
-                                </button>
+                                <section className="object-actions">
+                                    <button
+                                        type="button"
+                                        onClick={handleAddLine}
+                                    >
+                                        Add Line
+                                    </button>
 
-                                <button
-                                    type="button"
-                                    onClick={
-                                        handleRequestCloseOrder
-                                    }
-                                >
-                                    Close Order
-                                </button>
-                            </section>
-                        )}
+                                    <button
+                                        type="button"
+                                        onClick={
+                                            handleRequestCloseOrder
+                                        }
+                                    >
+                                        Close Order
+                                    </button>
+                                </section>
+                            )}
 
                         {/* Line report loading condition */}
                         {areLinesLoading && (
