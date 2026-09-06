@@ -17,6 +17,16 @@ The project is based on a real warehouse workflow: receiving staff record shipme
 - Navigate feature-specific pages through a React interface
 - Display loading, validation, empty, and API error states
 
+## Project Demo
+
+The repository includes screenshots that demonstrate the application's interface and core workflows without requiring visitors to configure and run the application locally.
+
+### Application Images
+
+The [`images`](./demo_content/images) folder contains screenshots of viewing all purchase orders, line details for a purchase order, receiving a purchase order line, viewing all SKUs while inspecting the main navigation dropdown, and editing a SKU with input error feedback. These images provide a quick visual overview of the workflow and can be viewed directly through GitHub.
+
+![View All Purchase Orders](./demo_content/images/all-purchase-orders.png)
+
 ## Technology Stack
 
 ### API
@@ -58,11 +68,14 @@ warehouse-receiving-tracker/
 │       │   ├── skus/            SKU pages, components, and services
 │       │   └── suppliers/       Supplier pages, hooks, and services
 │       ├── pages/               Index pages
+│       ├── utilities/           Reusable helper functions for rendering data
 │       ├── App.tsx              Application routes and top-level layout
 │       └── main.tsx             React entry point
 ├── database/
 │   ├── schema.sql               Tables, relationships, constraints, and indexes
 │   └── seed.sql                 Demonstration dataset
+demo_content/
+└── images/                      Demo images of application workflow
 ├── src/
 │   ├── config/                  Database and environment configuration
 │   ├── controllers/             HTTP request handling and responses
@@ -71,7 +84,7 @@ warehouse-receiving-tracker/
 │   ├── scripts/                 Test scripts
 │   ├── services/                Business and discrepancy calculations
 │   ├── types/                   Shared server domain types
-│   ├── utilities/               Reusable validation utilities
+│   ├── utilities/               Reusable validation functions for data
 │   └── index.ts                 Express application entry point
 ├── .env.example                 Example local configuration
 ├── package.json                 Server dependencies and commands
@@ -168,12 +181,15 @@ http://localhost:5173
 
 A useful way to evaluate the application is:
 
-1. View the seeded purchase orders and SKUs.
-2. Open a purchase order and inspect its expected line quantities.
-3. Record received and damaged quantities for an eligible line.
-4. Review the calculated usable quantity and discrepancy.
-5. Close a completed purchase order.
-6. Confirm that closed-order restrictions are enforced.
+### 1. View the seeded purchase orders and SKUs.
+### 2. Open a purchase order and inspect its expected line quantities.
+![View Purchase Order Details](./demo_content/images/purchase-order-details.png)
+### 3. Record received and damaged quantities for an eligible line.
+![Record a Line Receipt](./demo_content/images/record-receipt.png)
+### 4. Review the calculated usable quantity and discrepancy.
+### 5. Close a completed purchase order.
+### 6. Confirm that closed-order restrictions are enforced.
+![Closed Purchase Order](./demo_content/images/closed-purchase-order.png)
 
 ## Available Commands
 
@@ -214,6 +230,8 @@ Foreign keys preserve the relationships between suppliers, SKUs, purchase orders
 ## Validation and Error Handling
 
 The application validates identifiers, quantities, dates, supplier data, and SKU data before repository operations. SQL Server constraints provide an additional data-integrity layer. The client displays loading, invalid-request, missing-record, and API failure states to the user.
+
+![Edit SKU Error](./demo_content/images/edit-sku-error.png)
 
 ## Project Status
 
