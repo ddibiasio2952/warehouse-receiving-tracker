@@ -110,7 +110,7 @@ The included environment example assumes a local SQL Server Express instance nam
 1. Clone the repository and install the server dependencies:
 
 ```powershell
-git clone <repository-url>
+git clone https://github.com/ddibiasio2952/warehouse-receiving-tracker.git
 cd warehouse-receiving-tracker
 npm install
 ```
