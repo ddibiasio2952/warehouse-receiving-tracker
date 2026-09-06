@@ -150,7 +150,7 @@ function EditSkuPage() {
 
             // Return to view all SKUs
             navigate(
-                `/skus/all`
+                "/skus/all"
             );
         } catch (error) {
             console.error(

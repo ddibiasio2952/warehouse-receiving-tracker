@@ -1,4 +1,5 @@
 import type {
+    ApiErrorResponse,
     Sku,
     SkuRetrieveBody,
     SkuRequestBody
@@ -11,7 +12,11 @@ export async function getSkus():
 
     // Throw an error if request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to retrieve SKUs.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to retrieve SKUs.");
     }
 
     // Convert response into SKU objects
@@ -28,7 +33,11 @@ export async function getSkusBySupplierId(
 
     // Throw an error if request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to retrieve SKUs by supplier ID.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to retrieve SKUs by supplier ID.");
     }
 
     // Convert response into SKU objects
@@ -71,7 +80,11 @@ export async function addSku(
 
     // Throw an error if the request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to add new SKU.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to add new SKU.");
     }
 
     // Convert the response into a SKU object
@@ -98,7 +111,11 @@ export async function editSku(
 
     // Throw an error if the request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to modify the SKU.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to modify the SKU.");
     }
 
     // Convert the response into a SKU object

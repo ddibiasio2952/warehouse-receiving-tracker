@@ -263,7 +263,7 @@ export async function postOrder(
     // Validate expectedDate is in the future
     if (!validateDate(cleanedDate)) {
         response.status(400).json({
-            message: "The expected date must be in the future and match format YYY-MM-DD."
+            message: "The expected date must be in the future."
         });
 
         return;

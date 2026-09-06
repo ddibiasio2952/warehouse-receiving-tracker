@@ -17,7 +17,7 @@ function LineReportTable({
     // Display a message when the order has no lines
     if (lineReports.length === 0) {
         return (
-            <p>
+            <p className="error-message">
                 This purchase order has no line reports.
             </p>
         );

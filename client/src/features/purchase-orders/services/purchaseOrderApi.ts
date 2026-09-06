@@ -1,4 +1,5 @@
 import type {
+    ApiErrorResponse,
     PurchaseOrder,
     PurchaseOrderDetails,
     PurchaseOrderBody,
@@ -16,7 +17,11 @@ export async function getPurchaseOrders():
 
     // Throw an error if request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to retrieve purchase orders.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to retrieve purchase orders.");
     }
 
     // Convert response into purchase order objects
@@ -35,7 +40,11 @@ export async function getLineReports(
 
     // Throw an error if request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to retrieve line reports.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to retrieve line reports.");
     }
 
     // Convert response into line report objects
@@ -53,7 +62,10 @@ export async function getPurchaseOrderLine(
     );
 
     if (!response.ok) {
-        throw new Error(
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
             "Failed to retrieve the purchase order line."
         );
     }
@@ -80,7 +92,11 @@ export async function addPurchaseOrder(
 
     // Throw an error if the request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to add new purchase order.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to add new purchase order.");
     }
 
     // Convert the response into a purchase order details object
@@ -107,7 +123,11 @@ export async function addPurchaseOrderLine(
 
     // Throw an error if the request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to add new purchase order line.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to add new purchase order line.");
     }
 
     // Convert the response into a purchase order line result object
@@ -134,7 +154,11 @@ export async function recordReceipt(
 
     // Throw an error if request is unsucessful
     if (!response.ok) {
-        throw new Error("Failed to record receipt.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to record receipt.");
     }
 
     // Convert the response into an updated line result
@@ -156,7 +180,11 @@ export async function closePurchaseOrder(
 
     // Throw an error if request is unsuccessful
     if (!response.ok) {
-        throw new Error("Failed to record receipt.");
+        const errorData =
+            await response.json() as ApiErrorResponse;
+
+        throw new Error(errorData.message ??
+            "Failed to record receipt.");
     }
 
     // Convert the response into an updated purchase order detail

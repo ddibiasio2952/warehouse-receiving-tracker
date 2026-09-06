@@ -19,7 +19,7 @@ function AllSkusPage() {
 
     return (
         <main className="page-container">
-            <h1>SKUs</h1>
+            <h1>All SKUs</h1>
 
             {/* SKU actions */}
             {(

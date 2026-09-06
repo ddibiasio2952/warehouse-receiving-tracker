@@ -72,7 +72,7 @@ function AddPurchaseOrderPage() {
         <main className="page-container">
             <Link
                 className="back-link"
-                to="purchase-orders"
+                to="/purchase-orders"
             >
                 Back to Purchase Orders
             </Link>

@@ -17,7 +17,7 @@ function CloseOrderForm({
 }: CloseOrderFormProps) {
     
     async function handleClose(
-        event: SubmitEvent <HTMLFormElement>
+        event: SubmitEvent<HTMLFormElement>
     ): Promise<void> {
         event.preventDefault();
 

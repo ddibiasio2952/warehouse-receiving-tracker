@@ -69,7 +69,7 @@ function ClosePurchaseOrderPage() {
             );
 
             // Return to the purchase order list
-            navigate("/purchase-orders");
+            navigate("/purchase-orders/all");
         } catch (error) {
             console.error(
                 "Error closing purchase order:",

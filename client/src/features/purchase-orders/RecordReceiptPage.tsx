@@ -278,10 +278,17 @@ function RecordReceiptPage() {
                 </p>
             )}
 
-            {/* Selected SKU */}
+            {/* Selected SKU Number */}
             {lineDetails && (
                 <p>
                     SKU Number: {lineDetails.skuNumber}
+                </p>
+            )}
+
+            {/* Selected SKU Description */}
+            {lineDetails && (
+                <p>
+                    SKU Number: {lineDetails.skuDescription}
                 </p>
             )}
 

@@ -43,7 +43,6 @@ function AddPurchaseOrderForm({
     return (
         <form className="add-order-form"
             onSubmit={handleOrderSubmit}>
-            <h3>Submit New Purchase Order</h3>
 
             <label htmlFor="supplier-id">
                 Supplier

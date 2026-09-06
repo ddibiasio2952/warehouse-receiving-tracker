@@ -19,7 +19,7 @@ function AllPurchaseOrdersPage() {
 
     return (
         <main className="page-container">
-            <h1>Purchase Orders</h1>
+            <h1>All Purchase Orders</h1>
 
             {/* Purchase order actions */}
             {(

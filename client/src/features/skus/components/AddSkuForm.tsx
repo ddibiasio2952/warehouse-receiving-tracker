@@ -43,7 +43,6 @@ function AddSkuForm({
     return (
         <form className="add-sku-form"
             onSubmit={handleSkuSubmit}>
-            <h3>Submit New SKU</h3>
 
             <label htmlFor="supplier-id">
                 Supplier

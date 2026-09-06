@@ -20,19 +20,22 @@ function ReceiptForm({
     onSubmit
 }: ReceiptFormProps) {
     // Store the received quantity entered by the user
-    const [received, setReceived] = useState<number>(0);
+    const [received, setReceived] = useState<string>("");
 
     // Store the damaged quantity entered by the user
-    const [damaged, setDamaged] = useState<number>(0);
+    const [damaged, setDamaged] = useState<string>("");
 
     async function handleReceiptSubmit(
-        event: SubmitEvent <HTMLFormElement>
+        event: SubmitEvent<HTMLFormElement>
     ): Promise<void> {
         event.preventDefault();
 
+        const receivedQuantity = Number(received);
+        const damagedQuantity = Number(damaged);
+
         await onSubmit(lineId, {
-            received,
-            damaged
+            received: receivedQuantity,
+            damaged: damagedQuantity
         });
     }
 
@@ -41,31 +44,33 @@ function ReceiptForm({
             onSubmit={handleReceiptSubmit}>
 
             <label htmlFor="received">
-                Received Quantity
+                Overall Received Quantity
             </label>
 
             <input
                 id="received"
                 type="number"
                 min="0"
+                step="1"
                 value={received}
                 onChange={(event) =>
-                    setReceived(Number(event.target.value))
+                    setReceived(event.target.value)
                 }
                 required
             />
 
             <label htmlFor="damaged">
-                Damaged Quantity
+                Damaged Quantity from Overall Received
             </label>
 
             <input
                 id="damaged"
                 type="number"
                 min="0"
+                step="1"
                 value={damaged}
                 onChange={(event) =>
-                    setDamaged(Number(event.target.value))
+                    setDamaged(event.target.value)
                 }
                 required
             />

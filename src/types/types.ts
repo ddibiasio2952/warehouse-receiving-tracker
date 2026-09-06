@@ -1,6 +1,7 @@
 /* TYPES */
 export type PurchaseOrderStatus = "open" | "closed";
 export type LineStatus = "shortage" | "overage" | "match";
+export type ApiErrorResponse = { message?: string; };
 
 /* INTERFACES */
 

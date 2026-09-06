@@ -4,7 +4,7 @@ function HomePage() {
     return (
         <main>
             <h1>Receiving Management System</h1>
-            <h2>Index</h2>
+            <h2>Home Page</h2>
 
             <nav className="navigation">
                 <Link to="/purchase-orders">
@@ -12,7 +12,7 @@ function HomePage() {
                 </Link>
 
                 <Link to="/skus">
-                    Sku Management
+                    SKU Management
                 </Link>
             </nav>
         </main>

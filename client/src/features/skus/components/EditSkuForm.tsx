@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { SyntheticEvent } from "react";
+import type { SubmitEvent } from "react";
 
 
 // Import types
@@ -40,7 +40,7 @@ function EditSkuForm({
     ] = useState<string>(sku.description);
 
     async function handleEditSku(
-        event: SyntheticEvent<HTMLFormElement>
+        event: SubmitEvent<HTMLFormElement>
     ): Promise<void> {
         event.preventDefault();
 
@@ -54,7 +54,6 @@ function EditSkuForm({
     return (
         <form className="edit-sku-form"
             onSubmit={handleEditSku}>
-            <h3>Edit SKU</h3>
 
             <label htmlFor="supplier-id">
                 Supplier
@@ -66,7 +65,7 @@ function EditSkuForm({
                     setSupplierId(Number(event.target.value))
                 }
             >
-                <option value={supplierId}>
+                <option value={0}>
                     Select a Supplier
                 </option>
 

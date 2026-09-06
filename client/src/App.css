@@ -92,18 +92,11 @@ select {
     display: block;
 }
 
-/* Reveal submenu with mouse or keyboard */
+/* Open submenus for mouse hover or visible keyboard focus */
 .header-navigation .nav-item:hover > .sub-menu,
-.header-navigation .nav-item:focus-within > .sub-menu {
+.header-navigation .nav-item:has(a:focus-visible) > .sub-menu {
     visibility: visible;
     opacity: 1;
-}
-
-/* Hide previously focused submenus while hovering another feature */
-.header-navigation > ul:hover
-.nav-item:not(:hover) > .sub-menu {
-    visibility: hidden;
-    opacity: 0;
 }
 
 .navigation-link {
@@ -145,6 +138,10 @@ form {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+}
+
+.close-order-form button {
+  margin-bottom: 1.4rem;
 }
 
 /* Main Feature Navigation */
