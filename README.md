@@ -72,7 +72,7 @@ warehouse-receiving-tracker/
 │       ├── App.tsx              Application routes and top-level layout
 │       └── main.tsx             React entry point
 ├── database/
-│   ├── schema.sql               Tables, relationships, constraints, and indexes
+│   ├── script.sql               Tables, relationships, constraints, and indexes
 │   └── seed.sql                 Demonstration dataset
 demo_content/
 └── images/                      Demo images of application workflow
@@ -107,7 +107,7 @@ The included environment example assumes a local SQL Server Express instance nam
 
 ### Installation
 
-1. Clone the repository and install the server dependencies:
+#### 1. Clone the repository and install the server dependencies:
 
 ```bash
 git clone https://github.com/ddibiasio2952/warehouse-receiving-tracker.git
@@ -115,7 +115,7 @@ cd warehouse-receiving-tracker
 npm install
 ```
 
-2. Install the client dependencies:
+#### 2. Install the client dependencies:
 
 ```bash
 cd client
@@ -123,7 +123,7 @@ npm install
 cd ..
 ```
 
-3. Environment Configuration
+#### 3. Environment Configuration
 
 Create a local `.env` file from the example:
 
@@ -142,19 +142,19 @@ DB_DRIVER=ODBC Driver 18 for SQL Server
 
 Update these values if your SQL Server instance or database uses a different name. The local `.env` file is ignored by Git.
 
-4. Database Setup
+#### 4. Database Setup
 
 The repository includes separate scripts for the database structure and demonstration data:
 
-1. Open SQL Server Management Studio and connect to your SQL Server instance.
-2. Open `database/schema.sql`.
-3. Execute the script to create `receiving_database`, its tables, relationships, constraints, defaults, and indexes.
-4. Open `database/seed.sql`.
-5. Execute the script to insert the demonstration dataset.
+  1. Open SQL Server Management Studio and connect to your SQL Server instance.
+  2. Open `database/script.sql`.
+  3. Execute the script to create `receiving_database`, its tables, relationships, constraints, defaults, and indexes.
+  4. Open `database/seed.sql`.
+  5. Execute the script to insert the demonstration dataset.
 
-Always run `schema.sql` before `seed.sql`. The seed data represents the scenarios used to validate the application and is intended for a newly created, empty database.
+Always run `script.sql` before `seed.sql`. The seed data represents the scenarios used to validate the application and is intended for a newly created, empty database.
 
-5. Running the Application
+#### 5. Running the Application
 
 Start the API from the repository root:
 
