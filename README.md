@@ -128,7 +128,7 @@ cd ..
 Create a local `.env` file from the example:
 
 ```bash
-Copy-Item .env.example .env
+copy .env.example .env
 ```
 
 Default development configuration:
