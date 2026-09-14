@@ -1,19 +1,19 @@
-// Import Routers
-import purchaseOrderRouter from "./routes/purchaseOrderRoutes";
-import skuRouter from "./routes/skuRoutes";
-import supplierRouter from "./routes/supplierRoutes";
-
-// Import Middleware
-import { errorHandler } from "./middleware/errorHandler";
-import { notFoundHandler } from "./middleware/notFoundHandler";
-import { requestLogger } from "./middleware/requestLogger";
-
 // Import Express framework
 import express, {
     type Express,
     type Request,
     type Response
 } from "express";
+
+// Import Routers
+import purchaseOrderRouter from "./routes/purchaseOrderRoutes";
+import skuRouter from "./routes/skuRoutes";
+import supplierRouter from "./routes/supplierRoutes";
+
+// Import Middleware
+import { errorHandler, notFoundHandler } from "./middleware/errorHandlers";
+import { requestLogger } from "./middleware/requestLogger";
+
 
 // Create the Express application
 const app: Express = express();
@@ -57,7 +57,7 @@ app.get("/", (
 // Handle requests that do not match an existing route
 app.use(notFoundHandler);
 
-// Handle unexpected errors passed from route sor middleware
+// Handle unexpected errors passed from routes or middleware
 app.use(errorHandler);
 
 // Start HTTP server and listen for requests
