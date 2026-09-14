@@ -2,7 +2,8 @@
 import {
     Router,
     type Request,
-    type Response
+    type Response,
+    type NextFunction
 } from "express";
 
 // Import validation functions
@@ -36,27 +37,27 @@ const skuRouter: Router = Router();
 
 // Get all SKUs
 export async function getAllSkus(
-    request: Request,
-    response: Response
+    _request: Request,
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     try {
         // Get all SKUs from repository
         const result = await getSkus();
 
         response.status(200).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving all SKUs: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
 // Get a SKU by ID
 export async function getSkuById(
     request: Request<{ id: string }>,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const skuId: number = Number(request.params.id);
@@ -83,12 +84,10 @@ export async function getSkuById(
         }
 
         response.status(200).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving sku: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
@@ -96,7 +95,8 @@ export async function getSkuById(
 
 export async function getSkusBySupplier(
     request: Request<{ id: string }>,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const supplierId = Number(request.params.id);
@@ -115,12 +115,10 @@ export async function getSkusBySupplier(
         const result = await getSkusBySupplierId(supplierId);
 
         response.status(200).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving SKUs by supplier ID: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
@@ -131,7 +129,8 @@ export async function postSku(
         unknown,
         SkuRequestBody
     >,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Retrieve body values
     const { skuNumber, description, supplierId } = request.body ?? {};
@@ -210,12 +209,10 @@ export async function postSku(
         }
 
         response.status(201).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error posting SKU: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
@@ -226,7 +223,8 @@ export async function putSku(
         unknown,
         SkuRequestBody
     >,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const skuId = Number(request.params.id);
@@ -309,12 +307,10 @@ export async function putSku(
         const result = await updateSku(cleanedData);
 
         response.status(200).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error updating SKU: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 

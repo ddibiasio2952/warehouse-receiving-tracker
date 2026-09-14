@@ -3,7 +3,11 @@ import purchaseOrderRouter from "./routes/purchaseOrderRoutes";
 import skuRouter from "./routes/skuRoutes";
 import supplierRouter from "./routes/supplierRoutes";
 
-/* SERVER BOILERPLATE */
+// Import Middleware
+import { errorHandler } from "./middleware/errorHandler";
+import { notFoundHandler } from "./middleware/notFoundHandler";
+import { requestLogger } from "./middleware/requestLogger";
+
 // Import Express framework
 import express, {
     type Express,
@@ -17,7 +21,10 @@ const app: Express = express();
 // Set network port for server to listen from
 const port: number = 3000;
 
-// Allow server to read requests
+// Log incoming HTTP requests
+app.use(requestLogger);
+
+// Parse incoming JSON request bodies
 app.use(express.json());
 
 // Send requests to applicable routers
@@ -37,12 +44,21 @@ app.use(
 );
 
 // Define a GET endpoint for root URL
-app.get("/", (request: Request, response: Response): void => {
+app.get("/", (
+    request: Request,
+    response: Response
+): void => {
     // Send a JSON response to confirm API is online
     response.json({
         message: "Receiving Discrepancy Tracker API"
     });
 });
+
+// Handle requests that do not match an existing route
+app.use(notFoundHandler);
+
+// Handle unexpected errors passed from route sor middleware
+app.use(errorHandler);
 
 // Start HTTP server and listen for requests
 app.listen(port, (): void => {

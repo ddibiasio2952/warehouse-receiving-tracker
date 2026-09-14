@@ -2,7 +2,8 @@
 import {
     Router,
     type Request,
-    type Response
+    type Response,
+    type NextFunction
 } from "express";
 
 // Import validation functions
@@ -48,8 +49,9 @@ const purchaseOrderRouter: Router = Router();
 
 // Get all purchase orders
 export async function getAllPurchaseOrders(
-    request: Request,
-    response: Response
+    _request: Request,
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     try {
         // Get all purchase orders from repository
@@ -57,19 +59,18 @@ export async function getAllPurchaseOrders(
 
         response.status(200).json(result);
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving all purchase orders: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
 // Get a purchase order summary
 export async function getPurchaseOrderSummary(
     request: Request<{ id: string }>,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const purchaseOrderId: number = Number(request.params.id);
@@ -97,19 +98,18 @@ export async function getPurchaseOrderSummary(
 
         response.status(200).json(result);
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving purchase order summary: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
 // Get all purchase orders for review
 export async function getPurchaseOrdersForReview(
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     try {
         // Get all purchase order lines from repository
@@ -128,19 +128,18 @@ export async function getPurchaseOrdersForReview(
 
         response.status(200).json(result);
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving purchase orders for review: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
 // Get all line reports for a purchase order
 export async function getLineReportsByPurchaseOrderId(
     request: Request<{ id: string }>,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const orderId: number = Number(request.params.id);
@@ -167,19 +166,18 @@ export async function getLineReportsByPurchaseOrderId(
         const result = await getLineReports(orderId);
 
         response.status(200).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving purchase order line report: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
 // Get purchase order line by line ID
 export async function getLineByLineId(
     request: Request<{ id: string }>,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const lineId: number = Number(request.params.id);
@@ -206,12 +204,10 @@ export async function getLineByLineId(
         }
 
         response.status(200).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving purchase order line: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
@@ -222,29 +218,30 @@ export async function postOrder(
         unknown,
         PurchaseOrderBody
     >,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Retrieve body values
     const { supplierId, expectedDate } = request.body ?? {};
 
     // Validate Supplier ID
-        if (!isPositiveInteger(supplierId)) {
-            response.status(400).json({
-                message: "Supplier ID must be a positive integer."
-            });
-    
-            return;
-        }
-    
-        // Verify supplier exists
-        const exists = await supplierExists(supplierId);
-        if (!exists) {
-            response.status(404).json({
-                message: "Supplier not found."
-            });
+    if (!isPositiveInteger(supplierId)) {
+        response.status(400).json({
+            message: "Supplier ID must be a positive integer."
+        });
 
-            return;
-        }
+        return;
+    }
+
+    // Verify supplier exists
+    const exists = await supplierExists(supplierId);
+    if (!exists) {
+        response.status(404).json({
+            message: "Supplier not found."
+        });
+
+        return;
+    }
 
     // Verify expected date is a string and not empty
     if (
@@ -287,12 +284,10 @@ export async function postOrder(
         }
 
         response.status(201).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error posting purchase order: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
@@ -303,7 +298,8 @@ export async function postOrderLine(
         unknown,
         PurchaseOrderLineRequestBody
     >,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const orderId = Number(request.params.id);
@@ -344,12 +340,10 @@ export async function postOrderLine(
 
         response.status(201).json(result);
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error posting purchase order line: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
@@ -360,7 +354,8 @@ export async function putLineReceipt(
         unknown,
         ReceiptRequestBody
     >,
-    response: Response
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const lineId = Number(request.params.id);
@@ -404,25 +399,24 @@ export async function putLineReceipt(
             response.status(404).json({
                 message: "Purchase order line not found."
             });
-            
+
             return;
         }
 
         response.status(200).json(result);
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error updating receipt: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 
 // Patch a purchase order status as "closed"
 export async function closePurchaseOrderStatus(
-    request: Request <{ id: string }>,
-    response: Response
+    request: Request<{ id: string }>,
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     // Convert route param from string to number
     const orderId = Number(request.params.id);
@@ -450,12 +444,10 @@ export async function closePurchaseOrderStatus(
 
         response.status(200).json(result);
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error updating purchase order status: ", error);
 
-        response.status(500).json({
-            message: "An internal server error occurred."
-        });
+        next(error);
     }
 }
 

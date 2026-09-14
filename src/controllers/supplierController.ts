@@ -2,7 +2,8 @@
 import {
     Router,
     type Request,
-    type Response
+    type Response,
+    type NextFunction
 } from "express";
 
 // Import types
@@ -19,20 +20,19 @@ const supplierRouter: Router = Router();
 
 // Get all suppliers
 export async function getAllSuppliers(
-        request: Request,
-        response: Response
+    _request: Request,
+    response: Response,
+    next: NextFunction
 ): Promise<void> {
     try {
         // Get all suppliers from repository
         const result = await getSuppliers();
 
         response.status(200).json(result);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving all suppliers: ", error);
 
-        response.status(500).json({
-            message: "An internal server error has occurred."
-        });
+        next(error);
     }
 }
 
