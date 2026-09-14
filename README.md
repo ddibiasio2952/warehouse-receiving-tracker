@@ -16,6 +16,7 @@ The project is based on a real warehouse workflow: receiving staff record shipme
 - Associate SKUs and purchase orders with suppliers
 - Navigate feature-specific pages through a React interface
 - Display loading, validation, empty, and API error states
+- Centralized Express error handling reduces duplicated `500` response logic across controllers.
 
 ## Project Demo
 
@@ -79,6 +80,7 @@ demo_content/
 ├── src/
 │   ├── config/                  Database and environment configuration
 │   ├── controllers/             HTTP request handling and responses
+│   ├── middleware/              Logging, 404, and centralized error handling
 │   ├── repositories/            SQL Server data-access operations
 │   ├── routes/                  Express endpoint definitions
 │   ├── scripts/                 Test scripts
