@@ -1,4 +1,4 @@
-# Receiving Tracker
+# Warehouse Receiving Tracker
 
 A full-stack warehouse receiving application for comparing expected purchase-order quantities with the quantities actually received and damaged.
 
@@ -63,34 +63,35 @@ The [`images`](./demo_content/images) folder contains screenshots of viewing all
 warehouse-receiving-tracker/
 ├── client/
 │   └── src/
-│       ├── components/          Shared interface components
+│       ├── components/           Shared interface components
 │       ├── features/
-│       │   ├── purchase-orders/ Purchase-order pages, hooks, and services
-│       │   ├── skus/            SKU pages, components, and services
-│       │   └── suppliers/       Supplier pages, hooks, and services
-│       ├── pages/               Index pages
-│       ├── utilities/           Reusable helper functions for rendering data
-│       ├── App.tsx              Application routes and top-level layout
-│       └── main.tsx             React entry point
-├── database/
-│   ├── script.sql               Tables, relationships, constraints, and indexes
-│   └── seed.sql                 Demonstration dataset
-demo_content/
-└── images/                      Demo images of application workflow
-├── src/
-│   ├── config/                  Database and environment configuration
-│   ├── controllers/             HTTP request handling and responses
-│   ├── middleware/              Logging, 404, and centralized error handling
-│   ├── repositories/            SQL Server data-access operations
-│   ├── routes/                  Express endpoint definitions
-│   ├── scripts/                 Test scripts
-│   ├── services/                Business and discrepancy calculations
-│   ├── types/                   Shared server domain types
-│   ├── utilities/               Reusable validation functions for data
-│   └── index.ts                 Express application entry point
-├── .env.example                 Example local configuration
-├── package.json                 Server dependencies and commands
-└── README.md                    Project documentation
+│       │   ├── purchase-orders/  Purchase order pages, hooks, and services
+│       │   ├── skus/             SKU pages, components, hooks, and services
+│       │   └── suppliers/        Supplier pages, hooks, and services
+│       ├── pages/                Home page
+│       ├── utilities/            Reusable helpers for displaying data
+│       ├── App.tsx               Application routes and top-level layout
+│       └── main.tsx              React entry point
+├── demo_content/
+│   └── images/                   Demo images of the application workflow
+├── server/
+│   ├── database/
+│   │   ├── script.sql            Tables, relationships, constraints, and indexes
+│   │   └── seed.sql              Demonstration dataset
+│   ├── src/
+│   │   ├── config/               Database and environment configuration
+│   │   ├── controllers/          HTTP request handling and responses
+│   │   ├── middleware/           Logging and error handling
+│   │   ├── repositories/         SQL Server data access
+│   │   ├── routes/               Express endpoint definitions
+│   │   ├── scripts/              Test scripts
+│   │   ├── services/             Business and discrepancy calculations
+│   │   ├── types/                Server domain types
+│   │   ├── utilities/            Data validation functions
+│   │   └── index.ts              Express application entry point
+│   ├── .env.example              Example local configuration
+│   └── package.json              Server dependencies and commands
+└── README.md                     Project documentation
 ```
 
 ## Getting Started
