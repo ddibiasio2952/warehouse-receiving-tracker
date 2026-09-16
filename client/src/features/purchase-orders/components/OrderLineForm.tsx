@@ -24,19 +24,22 @@ function OrderLineForm({
     onSubmit
 }: OrderLineFormProps) {
     // Store the SKU ID entered by the user
-    const [skuId, setSkuId] = useState<number>(0);
+    const [skuId, setSkuId] = useState<string>("");
 
     // Store the expected SKU quantity entered by the user
-    const [expectedQuantity, setExpectedQuantity] = useState<number>(0);
+    const [expectedQuantity, setExpectedQuantity] = useState<string>("");
 
     async function handleLineSubmit(
         event: SubmitEvent<HTMLFormElement>
     ): Promise<void> {
         event.preventDefault();
 
+        const lineId = Number(skuId);
+        const lineQuantity = Number(expectedQuantity);
+
         await onSubmit(orderId, {
-            skuId,
-            expectedQuantity
+            skuId: lineId,
+            expectedQuantity: lineQuantity
         });
     }
 
@@ -52,7 +55,7 @@ function OrderLineForm({
                 id="skuId"
                 value={skuId}
                 onChange={(event) =>
-                    setSkuId(Number(event.target.value))
+                    setSkuId(event.target.value)
                 }
             >
                 <option value={0}>
@@ -77,9 +80,10 @@ function OrderLineForm({
                 id="expected-quantity"
                 type="number"
                 min="0"
+                step="1"
                 value={expectedQuantity}
                 onChange={(event) =>
-                    setExpectedQuantity(Number(event.target.value))
+                    setExpectedQuantity(event.target.value)
                 }
             />
 
