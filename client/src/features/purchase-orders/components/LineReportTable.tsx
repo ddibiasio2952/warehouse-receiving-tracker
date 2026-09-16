@@ -1,6 +1,6 @@
 import type {
     LineResult
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 // Props
 type LineReportTableProps = {

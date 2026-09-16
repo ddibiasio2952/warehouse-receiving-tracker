@@ -12,7 +12,7 @@ import {
 import type {
     PurchaseOrderLineDetails,
     ReceiptRequestBody
-} from "../../../../src/types/types";
+} from "../../../../server/src/types/types";
 
 import ReceiptForm from
     "./components/ReceiptForm";
@@ -97,9 +97,9 @@ function RecordReceiptPage() {
 
     // Retrieve the selected purchase order line
     useEffect(() => {
-    if (!hasValidParameters) {
-        return;
-    }
+        if (!hasValidParameters) {
+            return;
+        }
 
         const validLineId = purchaseOrderLineId;
         let requestWasCancelled = false;

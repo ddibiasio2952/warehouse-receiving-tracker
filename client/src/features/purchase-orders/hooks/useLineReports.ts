@@ -5,10 +5,10 @@ import {
 
 import type {
     LineResult
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
-import { 
-    getLineReports 
+import {
+    getLineReports
 } from "../services/purchaseOrderApi";
 
 
@@ -64,7 +64,7 @@ export function useLineReports(
                     "Error retrieving line reports: ",
                     error
                 );
-                
+
                 // Use empty array
                 setLineReports([]);
 

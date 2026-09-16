@@ -8,7 +8,7 @@ import type {
     PurchaseOrderLineDetails,
     PurchaseOrderLineRequestBody,
     ReceiptRequestBody
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 // Retrieve every purchase order
 export async function getPurchaseOrders():

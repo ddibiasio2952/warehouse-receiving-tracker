@@ -7,7 +7,7 @@ import type {
     Supplier,
     Sku,
     SkuRequestBody
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 // Props
 type EditSkuFormProps = {
@@ -106,11 +106,11 @@ function EditSkuForm({
                 required
             />
 
-            <button 
-            type="submit"
-            disabled={
-                supplierId === 0
-            }>
+            <button
+                type="submit"
+                disabled={
+                    supplierId === 0
+                }>
                 Edit SKU
             </button>
         </form>

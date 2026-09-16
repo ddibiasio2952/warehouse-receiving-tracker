@@ -1,5 +1,5 @@
 // Import SQL driver
-import sql = require("mssql/msnodesqlv8");
+import sql from "mssql/msnodesqlv8";
 
 // Import Pool
 import { getPool } from "../config/database";
@@ -384,7 +384,25 @@ export async function updateReceiptQuantities(
             WHERE PurchaseOrderLines.Id = @lineId;
         `);
 
-    return result.recordset[0];
+    const receiptQuantities = result.recordset[0];
+
+    if (receiptQuantities === undefined) {
+        return undefined;
+    }
+
+    return {
+        id: Number(receiptQuantities.id),
+        purchaseOrderId: Number(receiptQuantities.purchaseOrderId),
+        supplierId: Number(receiptQuantities.supplierId),
+        supplierName: receiptQuantities.supplierName,
+        skuId: Number(receiptQuantities.skuId),
+        skuNumber: receiptQuantities.skuNumber,
+        skuDescription: receiptQuantities.skuDescription,
+        expectedQuantity: Number(receiptQuantities.expectedQuantity),
+        receivedQuantity: Number(receiptQuantities.receivedQuantity),
+        damagedQuantity: Number(receiptQuantities.damagedQuantity),
+        receiptRecorded: Boolean(receiptQuantities.receiptRecorded)
+    }
 }
 
 // Open a purchase order
@@ -405,7 +423,11 @@ export async function openPurchaseOrder(
             SELECT
                 PurchaseOrders.Id AS id,
                 PurchaseOrders.Status AS status,
-                PurchaseOrders.ExpectedDate AS expectedDate,
+                CONVERT(
+                    VARCHAR(10),
+                    PurchaseOrders.ExpectedDate,
+                    23
+                ) AS expectedDate,
                 PurchaseOrders.SupplierId AS supplierId,
                 Suppliers.Name AS supplierName
             FROM PurchaseOrders
@@ -414,7 +436,19 @@ export async function openPurchaseOrder(
             WHERE PurchaseOrders.Id = @orderId
         `)
 
-    return result.recordset[0];
+    const order = result.recordset[0];
+
+    if (order === undefined) {
+        return undefined;
+    }
+
+    return {
+        id: Number(order.id),
+        status: order.status,
+        expectedDate: order.expectedDate,
+        supplierId: Number(order.supplierId),
+        supplierName: order.supplierName
+    }
 }
 
 // Close a purchase order
@@ -435,7 +469,11 @@ export async function closePurchaseOrder(
             SELECT
                 PurchaseOrders.Id AS id,
                 PurchaseOrders.Status AS status,
-                PurchaseOrders.ExpectedDate AS expectedDate,
+                CONVERT(
+                    VARCHAR(10),
+                    PurchaseOrders.ExpectedDate,
+                    23
+                ) AS expectedDate,
                 PurchaseOrders.SupplierId AS supplierId,
                 Suppliers.Name AS supplierName
             FROM PurchaseOrders
@@ -444,5 +482,17 @@ export async function closePurchaseOrder(
             WHERE PurchaseOrders.Id = @orderId
         `)
 
-    return result.recordset[0];
+    const order = result.recordset[0];
+
+    if (order === undefined) {
+        return undefined;
+    }
+
+    return {
+        id: Number(order.id),
+        status: order.status,
+        expectedDate: order.expectedDate,
+        supplierId: Number(order.supplierId),
+        supplierName: order.supplierName
+    }
 }

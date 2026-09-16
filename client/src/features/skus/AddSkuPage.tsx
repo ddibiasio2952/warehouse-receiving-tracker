@@ -7,7 +7,7 @@ import {
 
 import type {
     SkuRequestBody
-} from "../../../../src/types/types";
+} from "../../../../server/src/types/types";
 
 import AddSkuForm from
     "./components/AddSkuForm";

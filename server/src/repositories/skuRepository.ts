@@ -1,5 +1,5 @@
 // Import SQL driver
-import sql = require("mssql/msnodesqlv8");
+import sql from "mssql/msnodesqlv8";
 
 // Import Pool
 import { getPool } from "../config/database";
@@ -35,7 +35,7 @@ export async function getSkus():
         id: Number(sku.id),
         skuNumber: sku.skuNumber,
         description: sku.description,
-        supplierId: sku.supplierId,
+        supplierId: Number(sku.supplierId),
         supplierName: sku.supplierName
     }));
 }
@@ -68,7 +68,7 @@ export async function getSku(skuId: number):
         id: Number(sku.id),
         skuNumber: sku.skuNumber,
         description: sku.description,
-        supplierId: sku.supplierId
+        supplierId: Number(sku.supplierId)
     };
 }
 
@@ -97,7 +97,7 @@ export async function getSkusBySupplierId(supplierId: number):
         id: Number(sku.id),
         skuNumber: sku.skuNumber,
         description: sku.description,
-        supplierId: sku.supplierId
+        supplierId: Number(sku.supplierId)
     }));
 }
 
@@ -167,5 +167,16 @@ export async function updateSku(
             WHERE Id = @skuId;
         `);
 
-    return result.recordset[0];
+    const updatedSku = result.recordset[0];
+
+    if (updatedSku === undefined) {
+        return undefined;
+    }
+
+    return {
+        id: Number(updatedSku.id),
+        skuNumber: updatedSku.skuNumber,
+        description: updatedSku.description,
+        supplierId: Number(updatedSku.supplierId)
+    }
 }

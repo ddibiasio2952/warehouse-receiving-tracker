@@ -3,7 +3,7 @@ import type {
     Sku,
     SkuRetrieveBody,
     SkuRequestBody
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 // Retrieve every SKU
 export async function getSkus():

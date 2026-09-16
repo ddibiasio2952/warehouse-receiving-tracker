@@ -1,7 +1,7 @@
 import type {
     ApiErrorResponse,
     Supplier
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 // Retrieve every supplier
 export async function getSuppliers():

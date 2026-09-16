@@ -5,7 +5,7 @@ import type { SubmitEvent } from "react";
 import type {
     PurchaseOrderBody,
     Supplier
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 // Props
 type AddPurchaseOrderFormProps = {

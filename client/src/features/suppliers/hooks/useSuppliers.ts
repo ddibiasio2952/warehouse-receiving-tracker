@@ -5,7 +5,7 @@ import {
 
 import type {
     Supplier
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 import {
     getSuppliers

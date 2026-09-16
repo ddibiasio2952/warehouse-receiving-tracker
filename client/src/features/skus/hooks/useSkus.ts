@@ -5,7 +5,7 @@ import {
 
 import type {
     SkuRetrieveBody
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 import { getSkus } from "../services/skuApi";
 
@@ -23,7 +23,7 @@ export function useSkus() {
     ] = useState<string | null>(null);
 
     // Track whether SKUs are loading
-    const [ 
+    const [
         isLoading,
         setIsLoading
     ] = useState<boolean>(true);
@@ -37,14 +37,14 @@ export function useSkus() {
                 setIsLoading(true);
                 setErrorMessage(null);
 
-                const data = 
+                const data =
                     await getSkus();
 
-                    if (!requestWasCancelled) {
-                        setSkus(data);
-                    }
+                if (!requestWasCancelled) {
+                    setSkus(data);
+                }
             } catch (error) {
-                if(requestWasCancelled) {
+                if (requestWasCancelled) {
                     return;
                 }
 
@@ -74,8 +74,8 @@ export function useSkus() {
     }, []);
 
     return {
-    skus,
-    errorMessage,
-    isLoading
-}
+        skus,
+        errorMessage,
+        isLoading
+    }
 }

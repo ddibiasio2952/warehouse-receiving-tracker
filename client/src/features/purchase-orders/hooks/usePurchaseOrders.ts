@@ -5,7 +5,7 @@ import {
 
 import type {
     PurchaseOrderDetails
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 import { getPurchaseOrders } from "../services/purchaseOrderApi";
 

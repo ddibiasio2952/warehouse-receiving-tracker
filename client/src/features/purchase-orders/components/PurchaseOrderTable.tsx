@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import type {
     PurchaseOrderDetails
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 import { formatDate } from
     "../../../utilities/formatDate";

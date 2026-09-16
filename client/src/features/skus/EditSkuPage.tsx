@@ -12,7 +12,7 @@ import {
 import type {
     Sku,
     SkuRequestBody
-} from "../../../../src/types/types";
+} from "../../../../server/src/types/types";
 
 import EditSkuForm from
     "./components/EditSkuForm";

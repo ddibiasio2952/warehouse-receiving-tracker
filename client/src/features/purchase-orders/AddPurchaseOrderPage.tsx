@@ -7,7 +7,7 @@ import {
 
 import type {
     PurchaseOrderBody
-} from "../../../../src/types/types";
+} from "../../../../server/src/types/types";
 
 import AddPurchaseOrderForm from
     "./components/AddPurchaseOrderForm";

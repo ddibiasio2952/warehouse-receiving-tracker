@@ -2,7 +2,7 @@
 import "dotenv/config";
 
 // Import SQL driver
-import sql = require("mssql/msnodesqlv8");
+import sql from "mssql/msnodesqlv8";
 
 // Read connections
 const server = process.env.DB_SERVER;

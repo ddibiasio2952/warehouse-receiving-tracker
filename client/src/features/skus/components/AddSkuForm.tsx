@@ -5,7 +5,7 @@ import type { SubmitEvent } from "react";
 import type {
     Supplier,
     SkuRequestBody
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 // Props
 type AddSkuFormProps = {

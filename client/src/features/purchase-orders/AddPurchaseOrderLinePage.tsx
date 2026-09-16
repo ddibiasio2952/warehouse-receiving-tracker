@@ -8,7 +8,7 @@ import {
 
 import type {
     PurchaseOrderLineRequestBody
-} from "../../../../src/types/types";
+} from "../../../../server/src/types/types";
 
 import OrderLineForm from
     "./components/OrderLineForm";

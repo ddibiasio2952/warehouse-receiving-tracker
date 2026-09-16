@@ -6,11 +6,6 @@ import {
     type NextFunction
 } from "express";
 
-// Import types
-import {
-    Supplier,
-} from "../types/types";
-
 import {
     getSuppliers
 } from "../repositories/supplierRepository";

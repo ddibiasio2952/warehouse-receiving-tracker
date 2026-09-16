@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import type {
     SkuRetrieveBody
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
 // Props
 type SkuTableProps = {

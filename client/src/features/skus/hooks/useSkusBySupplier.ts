@@ -5,10 +5,10 @@ import {
 
 import type {
     Sku
-} from "../../../../../src/types/types";
+} from "../../../../../server/src/types/types";
 
-import { 
-    getSkusBySupplierId 
+import {
+    getSkusBySupplierId
 } from "../services/skuApi";
 
 export function useSkusBySupplier(
